@@ -25,25 +25,19 @@ public abstract class Account {
 
     private final int penaltyFee = 40;
 
-    private Date creationDate;
+    private final Date creationDate = new Date();
 
 
 
     public Account() {
     }
 
-    public Account(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Date creationDate) {
+    public Account(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner) {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
-        this.creationDate = creationDate;
     }
 
-    public Account(Money balance, AccountHolder primaryOwner, Date creationDate) {
-        this.balance = balance;
-        this.primaryOwner = primaryOwner;
-        this.creationDate = creationDate;
-    }
 
     public Long getId() {
         return id;
@@ -85,7 +79,4 @@ public abstract class Account {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
 }

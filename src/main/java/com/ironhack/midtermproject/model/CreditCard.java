@@ -25,17 +25,12 @@ public class CreditCard extends Account{
     @Digits(integer=1, fraction=1)
     private BigDecimal interestRate = new BigDecimal("0.2");
 
-    public CreditCard(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Date creationDate, BigDecimal creditLimit, BigDecimal interestRate) {
-        super(balance, primaryOwner, secondaryOwner, creationDate);
+    public CreditCard(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, BigDecimal creditLimit, BigDecimal interestRate) {
+        super(balance, primaryOwner, secondaryOwner);
         this.creditLimit = creditLimit;
         this.interestRate = interestRate;
     }
 
-    public CreditCard(Money balance, AccountHolder primaryOwner, Date creationDate, BigDecimal creditLimit, BigDecimal interestRate) {
-        super(balance, primaryOwner, creationDate);
-        this.creditLimit = creditLimit;
-        this.interestRate = interestRate;
-    }
 
     public CreditCard() {
     }

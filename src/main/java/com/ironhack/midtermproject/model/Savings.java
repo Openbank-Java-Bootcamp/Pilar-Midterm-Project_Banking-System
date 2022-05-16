@@ -13,7 +13,7 @@ public class Savings extends Account{
     private String secretKey;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.ACTIVE;
 
     @Column(columnDefinition = "double default 100") //so there's also a default value in the database table
     @DecimalMin(value = "100")
@@ -29,18 +29,9 @@ public class Savings extends Account{
     public Savings() {
     }
 
-    public Savings(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Date creationDate, String secretKey, Status status, BigDecimal minimumBalance, BigDecimal interestRate) {
-        super(balance, primaryOwner, secondaryOwner, creationDate);
+    public Savings(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, String secretKey, BigDecimal minimumBalance, BigDecimal interestRate) {
+        super(balance, primaryOwner, secondaryOwner);
         this.secretKey = secretKey;
-        this.status = status;
-        this.minimumBalance = minimumBalance;
-        this.interestRate = interestRate;
-    }
-
-    public Savings(Money balance, AccountHolder primaryOwner, Date creationDate, String secretKey, Status status, BigDecimal minimumBalance, BigDecimal interestRate) {
-        super(balance, primaryOwner, creationDate);
-        this.secretKey = secretKey;
-        this.status = status;
         this.minimumBalance = minimumBalance;
         this.interestRate = interestRate;
     }

@@ -1,18 +1,20 @@
 package com.ironhack.midtermproject.model;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
 @Entity
-@DiscriminatorValue(value="ThirdParty")
-public class ThirdParty extends User{
+public class ThirdParty{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
     private String hashedKey;
 
     public ThirdParty() {
     }
 
-    public ThirdParty(String name, String username, String password, Role role, String hashedKey) {
-        super(name, username, password, role);
+    public ThirdParty(String name, String hashedKey) {
+        this.name = name;
         this.hashedKey = hashedKey;
     }
 
@@ -22,5 +24,21 @@ public class ThirdParty extends User{
 
     public void setHashedKey(String hashedKey) {
         this.hashedKey = hashedKey;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -2,6 +2,9 @@ package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class User {
@@ -12,18 +15,23 @@ public abstract class User {
     private String username;
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name="role")
-    private Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Collection<Role> roles = new ArrayList<>();
 
     public User() {
     }
 
-    public User(String name, String username, String password, Role role) {
+    public User(String name, String username, String password, Collection<Role> roles) {
         this.name = name;
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
+    }
+
+    public User(String name, String username, String password) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
     }
 
     public Long getId() {
@@ -58,11 +66,11 @@ public abstract class User {
         this.password = password;
     }
 
-    public Role getRole() {
-        return role;
+    public Collection<Role> getRoles() {
+        return roles;
     }
 
     public void setRoles(Role role) {
-        this.role = role;
+        this.roles = roles;
     }
 }

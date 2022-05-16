@@ -14,22 +14,16 @@ public class StudentChecking extends Account{
     private String secretKey;
 
     @Enumerated
-    private Status status;
+    private Status status = Status.ACTIVE;
 
     public StudentChecking() {
     }
 
-    public StudentChecking(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Date creationDate, String secretKey, Status status) {
-        super(balance, primaryOwner, secondaryOwner, creationDate);
+    public StudentChecking(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, String secretKey) {
+        super(balance, primaryOwner, secondaryOwner);
         this.secretKey = secretKey;
-        this.status = status;
     }
 
-    public StudentChecking(Money balance, AccountHolder primaryOwner, Date creationDate, String secretKey, Status status) {
-        super(balance, primaryOwner, creationDate);
-        this.secretKey = secretKey;
-        this.status = status;
-    }
 
     public String getSecretKey() {
         return secretKey;

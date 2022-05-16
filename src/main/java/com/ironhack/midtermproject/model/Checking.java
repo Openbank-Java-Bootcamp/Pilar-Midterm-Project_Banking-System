@@ -17,7 +17,7 @@ public class Checking extends Account {
     private String secretKey;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.ACTIVE;
 
     private final BigDecimal minimumBalance = new BigDecimal("250");
     private final BigDecimal monthlyMaintenanceFee = new BigDecimal("12");
@@ -25,17 +25,11 @@ public class Checking extends Account {
     public Checking() {
     }
 
-    public Checking(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Date creationDate, String secretKey, Status status) {
-        super(balance, primaryOwner, secondaryOwner, creationDate);
+    public Checking(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, String secretKey) {
+        super(balance, primaryOwner, secondaryOwner);
         this.secretKey = secretKey;
-        this.status = status;
     }
 
-    public Checking(Money balance, AccountHolder primaryOwner, Date creationDate, String secretKey, Status status) {
-        super(balance, primaryOwner, creationDate);
-        this.secretKey = secretKey;
-        this.status = status;
-    }
 
     public String getSecretKey() {
         return secretKey;
