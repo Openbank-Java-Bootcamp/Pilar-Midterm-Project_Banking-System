@@ -14,6 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @RestController
 @RequestMapping("/accounts")
 public class AccountController implements IAccountController {
@@ -45,6 +48,24 @@ public class AccountController implements IAccountController {
         accountService.transferMoney(ownerTransferDTO);
     }
 
+
+    @GetMapping("/balance") //esto el accountholder
+    @ResponseStatus(HttpStatus.OK)
+    public BigDecimal getBalance(){
+        return accountService.getBalance();
+    }
+
+    @GetMapping("/balance/{Id}") //esto solo los admin
+    @ResponseStatus(HttpStatus.OK)
+    public BigDecimal getBalanceA(Long accountId){
+        return accountService.getBalance(accountId);
+    }
+
+    @PatchMapping("/setbalance") //esto solo los admin
+    @ResponseStatus(HttpStatus.OK)
+    public void changeBalance(Long accountId, BigDecimal newBalance){
+        accountService.changeBalance(accountId, newBalance);
+    }
 
 
 

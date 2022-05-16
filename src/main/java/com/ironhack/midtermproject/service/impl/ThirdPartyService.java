@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,17 @@ public class ThirdPartyService {
     }
 
     public void transferMoneyThirdParty(String hashedKey, ThirdPartyTransferDTO thirdPartyTransferDTO){
+        List<ThirdParty> listfromDB = thirdPartyRepository.findAll();
+        boolean existThirdParty = false;
+        for (ThirdParty i : listfromDB){
+            if(passwordEncoder.matches(hashedKey, i.getHashedKey())){
+                existThirdParty = true;
+                break;
+            }
+        }
+        if(!existThirdParty){
+            throw new IllegalArgumentException("The provided hashedKey is incorrect");
+        }
 
     }
 }

@@ -4,6 +4,7 @@ package com.ironhack.midtermproject.service.impl;
 import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
+import com.ironhack.midtermproject.repository.TransferRepository;
 import com.ironhack.midtermproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,9 @@ public class AccountService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TransferRepository transferRepository;
 
     public Account createCheckingAccount(Checking checkingAccount){
         Date dob = checkingAccount.getPrimaryOwner().getDateOfBirth();
@@ -87,7 +91,42 @@ public class AccountService {
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee()),Currency.getInstance("EUR")));
         } else if(currentAccount instanceof Checking && currentAccount.getBalance().getAmount().compareTo(((Checking) currentAccount).getMinimumBalance()) == -1){
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee()),Currency.getInstance("EUR")));
+        }
+
+        //comprobar fraude, cada vez que se hace una transferencia agregarla a la tabla transfer
+        Transfer transfer = new Transfer(currentAccount.getId(),ownerTransferDTO.getAmount(),new Date());
+        transferRepository.save(transfer);
+
+        //tengo que agrupar por dia y calcular el maximo amount transferido en un dia, y comparar con el total del dia en que se esta haciendo la transferencia.
+        //tambien comparar la diferencia de tiempo con la ultima transferencia, seleccionar la fecha mas grande¿¿???
     }
-}
+
+    public BigDecimal getBalance(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = null;
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            currentUsername = authentication.getName();
+        }
+        User currentUser = userRepository.findByUsername(currentUsername);
+        Long accountHolderId = currentUser.getId();
+        Account currentAccount = accountRepository.findByPrimaryOwnerId(accountHolderId).orElse(null);
+        if(currentAccount == null){
+            currentAccount = accountRepository.findBySecondaryOwnerId(accountHolderId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        }
+        return currentAccount.getBalance().getAmount();
+
+        //si la cuenta es savings o credit comparar la fecha de hoy con la fecha de creacion o desde que fue agregado interes.
+    }
+
+    public BigDecimal getBalance(Long accountId){
+        Account accountFromDB = accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
+        return accountFromDB.getBalance().getAmount();
+    }
+
+    public void changeBalance(Long accountId, BigDecimal newBalance){
+        Account accountFromDB = accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
+        accountFromDB.setBalance(new Money(newBalance,Currency.getInstance("EUR")));
+        accountRepository.save(accountFromDB);
+    }
 }
 

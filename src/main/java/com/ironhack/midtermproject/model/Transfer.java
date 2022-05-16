@@ -1,20 +1,27 @@
 package com.ironhack.midtermproject.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+import java.math.BigDecimal;
 import java.util.Date;
 
+@Entity
 public class Transfer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Account fromAccount;
-    private Account toAccount;
-    private Money amount;
+    private Long fromAccountId;
+    private BigDecimal amount;
     private Date date;
 
     public Transfer() {
     }
 
-    public Transfer(Account fromAccount, Account toAccount, Money amount, Date date) {
-        this.fromAccount = fromAccount;
-        this.toAccount = toAccount;
+    public Transfer(Long fromAccountId, BigDecimal amount, Date date) {
+        this.fromAccountId = fromAccountId;
         this.amount = amount;
         this.date = date;
     }
@@ -27,27 +34,20 @@ public class Transfer {
         this.id = id;
     }
 
-    public Account getFromAccount() {
-        return fromAccount;
+    public Long getFromAccount() {
+        return fromAccountId;
     }
 
-    public void setFromAccount(Account fromAccount) {
-        this.fromAccount = fromAccount;
+    public void setFromAccount(Long fromAccount) {
+        this.fromAccountId = fromAccount;
     }
 
-    public Account getToAccount() {
-        return toAccount;
-    }
 
-    public void setToAccount(Account toAccount) {
-        this.toAccount = toAccount;
-    }
-
-    public Money getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Money amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
