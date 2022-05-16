@@ -21,18 +21,12 @@ public abstract class User {
     public User() {
     }
 
-    public User(String name, String username, String password, Collection<Role> roles) {
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
-    }
-
     public User(String name, String username, String password) {
         this.name = name;
         this.username = username;
         this.password = password;
     }
+
 
     public Long getId() {
         return id;
@@ -70,7 +64,7 @@ public abstract class User {
         return roles;
     }
 
-    public void setRoles(Role role) {
+    public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
 }

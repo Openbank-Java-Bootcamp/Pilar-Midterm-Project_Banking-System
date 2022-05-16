@@ -3,6 +3,7 @@ package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -15,15 +16,15 @@ public abstract class Account {
     @Embedded
     private Money balance;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="primary_owner_id")
     private AccountHolder primaryOwner;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="secondary_owner_id")
     private AccountHolder secondaryOwner; //este tiene que ser opcional
 
-    private final int penaltyFee = 40;
+    private final BigDecimal penaltyFee = new BigDecimal("40");
 
     private final Date creationDate = new Date();
 
@@ -71,7 +72,7 @@ public abstract class Account {
         this.secondaryOwner = secondaryOwner;
     }
 
-    public int getPenaltyFee() {
+    public BigDecimal getPenaltyFee() {
         return penaltyFee;
     }
 

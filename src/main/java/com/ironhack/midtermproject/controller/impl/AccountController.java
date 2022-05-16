@@ -1,14 +1,17 @@
 package com.ironhack.midtermproject.controller.impl;
 
+import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
+import com.ironhack.midtermproject.DTO.ThirdPartyTransferDTO;
 import com.ironhack.midtermproject.controller.interfaces.IAccountController;
-import com.ironhack.midtermproject.model.Account;
-import com.ironhack.midtermproject.model.Checking;
-import com.ironhack.midtermproject.model.CreditCard;
-import com.ironhack.midtermproject.model.Savings;
+import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.service.impl.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,4 +38,14 @@ public class AccountController implements IAccountController {
     public void createCreditAccount(CreditCard creditAccount){
         accountService.createCreditAccount(creditAccount);
     }
+
+    @PostMapping("/transfer")
+    @ResponseStatus(HttpStatus.OK)
+    public void transferMoney(OwnerTransferDTO ownerTransferDTO){
+        accountService.transferMoney(ownerTransferDTO);
+    }
+
+
+
+
 }

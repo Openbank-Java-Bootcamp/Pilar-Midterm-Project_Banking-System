@@ -18,18 +18,13 @@ public class AccountHolder extends User{
     public AccountHolder() {
     }
 
-    public AccountHolder(String name, String username, String password, Role role, Date dateOfBirth, Address primaryAddress, String mailingAddress) {
-        super(name, username, password, role);
+    public AccountHolder(String name, String username, String password, Date dateOfBirth, Address primaryAddress, String mailingAddress) {
+        super(name, username, password);
         this.dateOfBirth = dateOfBirth;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
     }
 
-    public AccountHolder(String name, String username, String password, Role role, Date dateOfBirth, Address primaryAddress) {
-        super(name, username, password, role);
-        this.dateOfBirth = dateOfBirth;
-        this.primaryAddress = primaryAddress;
-    }
 
     public Date getDateOfBirth() {
         return dateOfBirth;

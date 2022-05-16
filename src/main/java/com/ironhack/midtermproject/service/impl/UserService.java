@@ -1,5 +1,7 @@
 package com.ironhack.midtermproject.service.impl;
 
+import com.ironhack.midtermproject.model.AccountHolder;
+import com.ironhack.midtermproject.model.Admin;
 import com.ironhack.midtermproject.model.User;
 import com.ironhack.midtermproject.repository.RoleRepository;
 import com.ironhack.midtermproject.repository.UserRepository;
@@ -7,12 +9,14 @@ import com.ironhack.midtermproject.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.BeanDefinitionDsl;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +43,14 @@ public class UserService implements IUserService, UserDetailsService {
     public List<User> getUsers(){
         log.info("Fetching all users");
         return userRepository.findAll();
+    }
+
+    public AccountHolder createAccountHolder(AccountHolder accountHolder){
+        return userRepository.save(accountHolder);
+    }
+
+    public Admin createAdmin(Admin admin){
+        return userRepository.save(admin);
     }
 
 

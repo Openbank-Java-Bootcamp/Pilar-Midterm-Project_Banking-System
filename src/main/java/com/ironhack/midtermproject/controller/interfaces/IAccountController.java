@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject.controller.interfaces;
 
+import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
 import com.ironhack.midtermproject.model.Account;
 import com.ironhack.midtermproject.model.Checking;
 import com.ironhack.midtermproject.model.CreditCard;
@@ -10,4 +11,5 @@ public interface IAccountController {
     void createCheckingAccount(Checking checkingAccount);
     void createSavingsAccount(Savings savingsAccount);
     void createCreditAccount(CreditCard creditAccount);
+    void transferMoney(OwnerTransferDTO ownerTransferDTO);
 }
