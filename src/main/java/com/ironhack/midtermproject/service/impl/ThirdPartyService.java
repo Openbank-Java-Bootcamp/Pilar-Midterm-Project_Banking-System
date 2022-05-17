@@ -1,15 +1,19 @@
 package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.DTO.ThirdPartyTransferDTO;
-import com.ironhack.midtermproject.model.ThirdParty;
+import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
 import com.ironhack.midtermproject.repository.ThirdPartyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
 
 
@@ -43,7 +47,18 @@ public class ThirdPartyService {
         }
         if(!existThirdParty){
             throw new IllegalArgumentException("The provided hashedKey is incorrect");
+        } else {
+            Long targetAccountId = thirdPartyTransferDTO.getAccountId();
+            Account targetAccount = accountRepository.findById(targetAccountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+            String secretKey = accountRepository.findSecretKeyByAccountId(targetAccountId);
+            if(secretKey.equals(thirdPartyTransferDTO.getAccountSecretKey())){
+                targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().add(thirdPartyTransferDTO.getAmount()), Currency.getInstance("EUR")));
+                accountRepository.save(targetAccount);
+            } else{
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided key does not match the account id");
+            }
         }
+
 
     }
 }

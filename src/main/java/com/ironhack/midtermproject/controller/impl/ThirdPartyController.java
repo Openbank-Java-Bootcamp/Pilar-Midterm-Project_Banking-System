@@ -23,9 +23,9 @@ public class ThirdPartyController implements IThirdPartyController {
         thirdPartyService.saveThirdParty(thirdParty);
     }
 
-    @PostMapping("/thirdparties/{hashedKey}")
+    @PostMapping("/thirdtransfer")
     @ResponseStatus(HttpStatus.OK)
-    public void transferMoneyThirdParty(String hashedKey, ThirdPartyTransferDTO thirdPartyTransferDTO){
+    public void transferMoneyThirdParty(@RequestParam String hashedKey, @RequestBody ThirdPartyTransferDTO thirdPartyTransferDTO){
         thirdPartyService.transferMoneyThirdParty(hashedKey, thirdPartyTransferDTO);
     }
 }

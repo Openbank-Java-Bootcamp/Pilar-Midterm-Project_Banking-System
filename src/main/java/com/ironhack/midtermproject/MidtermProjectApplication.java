@@ -50,10 +50,9 @@ public class MidtermProjectApplication {
 			roleService.addRoleToUser("chris", "ROLE_ADMIN");
 			roleService.addRoleToUser("chris", "ROLE_USER");
 
-			accountService.createCheckingAccount(new Checking(new Money(new BigDecimal("200"), Currency.getInstance("EUR")), (AccountHolder) userRepository.findById(1L).get(),null,"1357");
+			accountService.createCheckingAccount(new Checking(new Money(new BigDecimal("200"), Currency.getInstance("EUR")), (AccountHolder) userRepository.findById(1L).get(),null,"1357"));
 
 		};
 	}
-
 
 }

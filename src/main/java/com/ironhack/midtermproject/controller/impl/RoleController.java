@@ -26,7 +26,7 @@ public class RoleController implements IRoleController {
     }
 
 
-    @PostMapping("/roles/addtouser")
+    @PostMapping("/roletouser")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addRoleToUser(RoleToUserDTO roleToUserDto){
         roleService.addRoleToUser(roleToUserDto.getUsername(),roleToUserDto.getRoleName());

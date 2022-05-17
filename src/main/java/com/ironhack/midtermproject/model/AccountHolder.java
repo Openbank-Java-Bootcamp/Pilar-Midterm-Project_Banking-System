@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 public class AccountHolder extends User{
 
-    @Pattern(regexp = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date format must be YYYY-MM-DD")
+    //@Pattern(regexp = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date format must be YYYY-MM-DD")
     private LocalDate dateOfBirth;
     @Embedded
     private Address primaryAddress;
