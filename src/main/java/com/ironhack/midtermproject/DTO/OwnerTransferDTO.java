@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 
 public class OwnerTransferDTO {
     private BigDecimal amount;
-    private String ownerTargetId;
+    private String ownerTargetName;
     private Long targetAccountId;
 
-    public OwnerTransferDTO(BigDecimal amount, String ownerTargetId, Long targetAccountId) {
+    public OwnerTransferDTO(BigDecimal amount, String ownerTargetName, Long targetAccountId) {
         this.amount = amount;
-        this.ownerTargetId = ownerTargetId;
+        this.ownerTargetName = ownerTargetName;
         this.targetAccountId = targetAccountId;
     }
 
@@ -24,11 +24,11 @@ public class OwnerTransferDTO {
     }
 
     public String getOwnerTargetId() {
-        return ownerTargetId;
+        return ownerTargetName;
     }
 
     public void setOwnerTargetId(String ownerTargetId) {
-        this.ownerTargetId = ownerTargetId;
+        this.ownerTargetName = ownerTargetName;
     }
 
     public Long getTargetAccountId() {

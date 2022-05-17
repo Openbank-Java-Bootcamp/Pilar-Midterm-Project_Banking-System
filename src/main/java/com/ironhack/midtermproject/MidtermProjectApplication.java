@@ -44,14 +44,14 @@ public class MidtermProjectApplication {
 
 			thirdPartyService.saveThirdParty(new ThirdParty("Pedrito","4321"));
 
-			roleService.addRoleToUser("john", "ROLE_USER");
+			roleService.addRoleToUser("john", "ROLE_ACCOUNT_HOLDER");
 			roleService.addRoleToUser("james", "ROLE_ADMIN");
 			roleService.addRoleToUser("jane", "ROLE_USER");
 			roleService.addRoleToUser("chris", "ROLE_ADMIN");
 			roleService.addRoleToUser("chris", "ROLE_USER");
 
 			accountService.createCheckingAccount(new Checking(new Money(new BigDecimal("200"), Currency.getInstance("EUR")), (AccountHolder) userRepository.findById(1L).get(),null,"1357"));
-
+			accountService.createCheckingAccount(new Checking(new Money(new BigDecimal("500"), Currency.getInstance("EUR")), (AccountHolder) userRepository.findById(2L).get(),null,"1387"));
 		};
 	}
 
