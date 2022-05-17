@@ -1,11 +1,13 @@
 package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.Embeddable;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Currency;
 
 @Embeddable
+@Data
 public class Money {
     private BigDecimal amount;
     private Currency currency;

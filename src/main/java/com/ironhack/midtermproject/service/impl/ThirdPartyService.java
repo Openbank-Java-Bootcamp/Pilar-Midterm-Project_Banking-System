@@ -33,9 +33,9 @@ public class ThirdPartyService {
     }
 
     public void transferMoneyThirdParty(String hashedKey, ThirdPartyTransferDTO thirdPartyTransferDTO){
-        List<ThirdParty> listfromDB = thirdPartyRepository.findAll();
+        List<ThirdParty> listFromDB = thirdPartyRepository.findAll();
         boolean existThirdParty = false;
-        for (ThirdParty i : listfromDB){
+        for (ThirdParty i : listFromDB){
             if(passwordEncoder.matches(hashedKey, i.getHashedKey())){
                 existThirdParty = true;
                 break;

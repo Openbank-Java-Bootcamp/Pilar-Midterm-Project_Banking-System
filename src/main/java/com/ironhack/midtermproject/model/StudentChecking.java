@@ -4,12 +4,14 @@ import com.ironhack.midtermproject.enums.Status;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
+import lombok.Data;
 
 import java.util.Date;
 
 
 @Entity
 @DiscriminatorValue(value="StudentChecking")
+@Data
 public class StudentChecking extends Account{
     private String secretKey;
 

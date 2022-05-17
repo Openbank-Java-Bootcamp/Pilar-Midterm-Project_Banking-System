@@ -1,12 +1,14 @@
 package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Data
 public abstract class User {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -16,7 +18,7 @@ public abstract class User {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<>();
+    private Collection<Role> roles;
 
     public User() {
     }
@@ -25,6 +27,7 @@ public abstract class User {
         this.name = name;
         this.username = username;
         this.password = password;
+        this.roles = new ArrayList<>();
     }
 
 

@@ -1,8 +1,10 @@
 package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 public class ThirdParty{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

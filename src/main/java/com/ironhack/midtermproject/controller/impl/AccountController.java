@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
 public class AccountController implements IAccountController {
 
     @Autowired
@@ -30,13 +30,13 @@ public class AccountController implements IAccountController {
         accountService.createCheckingAccount(checkingAccount);
     }
 
-    @PostMapping("/saving")
+    @PostMapping("/saving") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
     public void createSavingsAccount(Savings savingsAccount){
         accountService.createSavingsAccount(savingsAccount);
     }
 
-    @PostMapping("/credit")
+    @PostMapping("/credit") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
     public void createCreditAccount(CreditCard creditAccount){
         accountService.createCreditAccount(creditAccount);

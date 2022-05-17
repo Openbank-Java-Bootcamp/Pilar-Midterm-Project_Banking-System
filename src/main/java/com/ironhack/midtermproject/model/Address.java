@@ -1,8 +1,10 @@
 package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.Embeddable;
+import lombok.Data;
 
 @Embeddable
+@Data
 public class Address {
     private String streetAddress;
     private String postalCode;

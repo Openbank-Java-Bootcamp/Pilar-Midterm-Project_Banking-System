@@ -12,13 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController implements IUserController {
 
     @Autowired
     UserService userService;
 
-    @PostMapping("/users/")
+    @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public void createAccountHolder(@RequestBody AccountHolder accountHolder){
         userService.createAccountHolder(accountHolder);

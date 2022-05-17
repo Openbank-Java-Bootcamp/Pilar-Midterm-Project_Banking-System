@@ -8,12 +8,10 @@ import com.ironhack.midtermproject.model.ThirdParty;
 import com.ironhack.midtermproject.service.impl.ThirdPartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api")
 public class ThirdPartyController implements IThirdPartyController {
 
     @Autowired

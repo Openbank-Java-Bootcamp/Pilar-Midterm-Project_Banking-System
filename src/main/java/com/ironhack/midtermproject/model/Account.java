@@ -2,12 +2,16 @@ package com.ironhack.midtermproject.model;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Currency;
 import java.util.Date;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Data
 public abstract class Account {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -16,18 +20,23 @@ public abstract class Account {
     @Embedded
     private Money balance;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="primary_owner_id")
     private AccountHolder primaryOwner;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="secondary_owner_id")
     private AccountHolder secondaryOwner; //este tiene que ser opcional
 
-    private final BigDecimal penaltyFee = new BigDecimal("40");
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="amount", column=@Column(name="penalty_fee_amount")),
+            @AttributeOverride(name="currency", column=@Column(name="penalty_fee_currency"))
+    })
+    private Money penaltyFee;
 
-    private final Date creationDate = new Date();
-
+    //private final Date creationDate = new Date();
+    private LocalDate creationDate = LocalDate.now();
 
 
     public Account() {
@@ -37,6 +46,7 @@ public abstract class Account {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
+        this.penaltyFee = new Money(new BigDecimal("40"), Currency.getInstance("EUR"));
     }
 
 
@@ -72,11 +82,11 @@ public abstract class Account {
         this.secondaryOwner = secondaryOwner;
     }
 
-    public BigDecimal getPenaltyFee() {
+    public Money getPenaltyFee() {
         return penaltyFee;
     }
 
-    public Date getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
