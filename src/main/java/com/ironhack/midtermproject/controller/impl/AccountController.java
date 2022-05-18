@@ -1,7 +1,6 @@
 package com.ironhack.midtermproject.controller.impl;
 
-import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
-import com.ironhack.midtermproject.DTO.ThirdPartyTransferDTO;
+import com.ironhack.midtermproject.DTO.*;
 import com.ironhack.midtermproject.controller.interfaces.IAccountController;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.service.impl.AccountService;
@@ -26,20 +25,20 @@ public class AccountController implements IAccountController {
 
     @PostMapping("/checking")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCheckingAccount(@RequestBody Checking checkingAccount){
-        accountService.createCheckingAccount(checkingAccount);
+    public void createCheckingAccount(@RequestBody CheckingAccountDTO checkingAccountDTO){
+        accountService.createCheckingAccount(checkingAccountDTO);
     }
 
     @PostMapping("/saving") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
-    public void createSavingsAccount(@RequestBody Savings savingsAccount){
-        accountService.createSavingsAccount(savingsAccount);
+    public void createSavingsAccount(@RequestBody SavingAccountDTO savingAccountDTO){
+        accountService.createSavingsAccount(savingAccountDTO);
     }
 
     @PostMapping("/credit") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCreditAccount(@RequestBody CreditCard creditAccount){
-        accountService.createCreditAccount(creditAccount);
+    public void createCreditAccount(@RequestBody CreditAccountDTO creditAccountDTO){
+        accountService.createCreditAccount(creditAccountDTO);
     }
 
     @PostMapping("/transfer")

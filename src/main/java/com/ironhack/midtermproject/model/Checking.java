@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.model;
 
 import com.ironhack.midtermproject.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.Date;
 @DiscriminatorValue(value="Checking")
 @Data
 public class Checking extends Account {
+    @NotNull
     private String secretKey;
 
     @Enumerated(EnumType.STRING)
@@ -25,16 +27,16 @@ public class Checking extends Account {
             @AttributeOverride(name="amount", column=@Column(name="checking_minimum_balance_amount")),
             @AttributeOverride(name="currency", column=@Column(name="checking_minimum_balance_currency"))
     })
-    private Money minimumBalance = new Money(new BigDecimal("250"), Currency.getInstance("EUR"));
+    private Money minimumBalance;
 
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name="amount", column=@Column(name="checking_maintenance_fee_amount")),
             @AttributeOverride(name="currency", column=@Column(name="checking_maintenance_fee_currency"))
     })
-    private Money monthlyMaintenanceFee = new Money(new BigDecimal("12"),Currency.getInstance("EUR"));
+    private Money monthlyMaintenanceFee;
 
-    private LocalDate maintenanceCharged = null;
+    private LocalDate maintenanceCharged;
     public Checking() {
     }
 
@@ -42,6 +44,9 @@ public class Checking extends Account {
         super(balance, primaryOwner, secondaryOwner);
         this.secretKey = secretKey;
         this.status = status;
+        this.minimumBalance = new Money(new BigDecimal("250"), Currency.getInstance("EUR"));
+        this.monthlyMaintenanceFee = new Money(new BigDecimal("12"),Currency.getInstance("EUR"));
+        this.maintenanceCharged = null;
     }
 
     public String getSecretKey() {

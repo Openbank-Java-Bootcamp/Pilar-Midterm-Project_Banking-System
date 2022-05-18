@@ -1,7 +1,10 @@
 package com.ironhack.midtermproject.service.impl;
 
 
+import com.ironhack.midtermproject.DTO.CheckingAccountDTO;
+import com.ironhack.midtermproject.DTO.CreditAccountDTO;
 import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
+import com.ironhack.midtermproject.DTO.SavingAccountDTO;
 import com.ironhack.midtermproject.enums.Status;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
@@ -38,26 +41,50 @@ public class AccountService {
     @Autowired
     TransferRepository transferRepository;
 
-    public Account createCheckingAccount(Checking checkingAccount){
-        LocalDate dob = checkingAccount.getPrimaryOwner().getDateOfBirth();
-        LocalDate now = LocalDate.now();
-        int yearDOB = dob.getMonthValue();
-        int yearNow = now.getMonthValue();
-        int age = yearNow -yearDOB;
-        if(age < 24){
-            StudentChecking studentAccount = new StudentChecking(checkingAccount.getBalance(),checkingAccount.getPrimaryOwner(),checkingAccount.getSecondaryOwner(),checkingAccount.getSecretKey());
-            return accountRepository.save(studentAccount);
-        } else{
-            return accountRepository.save(checkingAccount);
+    public Account createCheckingAccount(CheckingAccountDTO checkingAccountDTO){
+        User primaryOwner =userRepository.findById(checkingAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
+        User secondaryOwner = userRepository.findById(checkingAccountDTO.getPrimaryAccountOwnerId()).orElse(null);
+        if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
+            LocalDate dob = ((AccountHolder) primaryOwner).getDateOfBirth();
+            LocalDate now = LocalDate.now();
+            int yearDOB = dob.getMonthValue();
+            int yearNow = now.getMonthValue();
+            int age = yearNow -yearDOB;
+            if(age < 24){
+                StudentChecking studentAccount = new StudentChecking(checkingAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner,checkingAccountDTO.getSecretKey());
+                return accountRepository.save(studentAccount);
+            } else{
+                Checking checkingAccount = new Checking(checkingAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner,checkingAccountDTO.getSecretKey());
+                return accountRepository.save(checkingAccount);
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The primary Owner and/or secondaryOwner weren't found");
         }
+
     }
 
-    public Savings createSavingsAccount(Savings savingsAccount){
-        return accountRepository.save(savingsAccount);
+    public Savings createSavingsAccount(SavingAccountDTO savingAccountDTO){
+        User primaryOwner =  userRepository.findById(savingAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
+        User secondaryOwner = userRepository.findById(savingAccountDTO.getPrimaryAccountOwnerId()).orElse(null);
+        if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
+            Savings savingAccount = new Savings(savingAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner, savingAccountDTO.getSecretKey(),savingAccountDTO.getMinimumBalance(), savingAccountDTO.getInterestRate());
+            return accountRepository.save(savingAccount);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The primary Owner and/or secondaryOwner weren't found");
+        }
+
+
     }
 
-    public CreditCard createCreditAccount(CreditCard creditAccount){
-        return accountRepository.save(creditAccount);
+    public CreditCard createCreditAccount(CreditAccountDTO creditAccountDTO){
+        User primaryOwner =  userRepository.findById(creditAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
+        User secondaryOwner = userRepository.findById(creditAccountDTO.getPrimaryAccountOwnerId()).orElse(null);
+        if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
+            CreditCard creditAccount = new CreditCard(creditAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner,creditAccountDTO.getCreditLimit(), creditAccountDTO.getInterestRate());
+            return accountRepository.save(creditAccount);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The primary Owner and/or secondaryOwner weren't found");
+        }
     }
 
     public void transferMoney(OwnerTransferDTO ownerTransferDTO){

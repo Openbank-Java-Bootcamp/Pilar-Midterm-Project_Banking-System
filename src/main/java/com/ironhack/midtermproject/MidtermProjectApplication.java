@@ -1,5 +1,6 @@
 package com.ironhack.midtermproject;
 
+import com.ironhack.midtermproject.DTO.CheckingAccountDTO;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
 import com.ironhack.midtermproject.repository.UserRepository;
@@ -50,8 +51,8 @@ public class MidtermProjectApplication {
 			roleService.addRoleToUser("chris", "ROLE_ADMIN");
 			roleService.addRoleToUser("chris", "ROLE_USER");
 
-			accountService.createCheckingAccount(new Checking(new Money(new BigDecimal("200"), Currency.getInstance("EUR")), (AccountHolder) userRepository.findById(1L).get(),null,"1357"));
-			accountService.createCheckingAccount(new Checking(new Money(new BigDecimal("500"), Currency.getInstance("EUR")), (AccountHolder) userRepository.findById(2L).get(),null,"1387"));
+			accountService.createCheckingAccount(new CheckingAccountDTO(new Money(new BigDecimal("200"), Currency.getInstance("EUR")), 1L,null,"1357"));
+			accountService.createCheckingAccount(new CheckingAccountDTO(new Money(new BigDecimal("500"), Currency.getInstance("EUR")), 2L,null,"1387"));
 		};
 	}
 

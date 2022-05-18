@@ -26,10 +26,8 @@ public class Savings extends Account{
     })
     private Money minimumBalance;
 
-    @Column(columnDefinition = "double default 0.0025") //so there's also a default value in the database table
-    @DecimalMax(value = "0.5")
-    @Digits(integer=1, fraction=4)
-    private BigDecimal interestRate= new BigDecimal("0.0025");
+    @Digits(integer=1, fraction=4) //entero es 1 o 0???
+    private BigDecimal interestRate;
 
     private LocalDate addedInterest = null;
 
@@ -40,7 +38,7 @@ public class Savings extends Account{
         super(balance, primaryOwner, secondaryOwner);
         this.secretKey = secretKey;
         setMinimumBalance(minimumBalance);
-        this.interestRate = interestRate;
+        setInterestRate(interestRate);
     }
 
     public String getSecretKey() {
@@ -64,7 +62,7 @@ public class Savings extends Account{
     }
 
     public void setMinimumBalance(Money minimumBalance) {
-        if(minimumBalance.getAmount().compareTo(new BigDecimal(100)) == -1 || minimumBalance.getAmount().compareTo(new BigDecimal(1000)) == 1){
+        if(minimumBalance.getAmount().compareTo(new BigDecimal(100)) == -1 || minimumBalance.getAmount().compareTo(new BigDecimal(1000)) == 1 || minimumBalance.getAmount()==null){
             this.minimumBalance = new Money(new BigDecimal(1000),Currency.getInstance("EUR"));
         } else {
             this.minimumBalance = minimumBalance;
@@ -76,7 +74,11 @@ public class Savings extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
+        if(interestRate.compareTo(new BigDecimal(0.5)) == 1 || interestRate.compareTo(new BigDecimal(0)) == 0 || interestRate.compareTo(new BigDecimal(0)) == -1 || interestRate == null){
+            this.interestRate = new BigDecimal("0.0025");
+        } else {
+            this.interestRate = interestRate;
+        }
     }
 
     public void setAddedInterest(LocalDate addedInterest) {

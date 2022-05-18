@@ -24,18 +24,15 @@ public class CreditCard extends Account{
     })
     private Money creditLimit;
 
-    @Column(columnDefinition = "double default 0.2") //so there's also a default value in the database table
-    @DecimalMin(value = "0.1")
-    @DecimalMax(value = "0.2")
-    @Digits(integer=1, fraction=1)
-    private BigDecimal interestRate = new BigDecimal("0.2");
+    @Digits(integer=1, fraction=1)  //entero es 1 o 0???
+    private BigDecimal interestRate;
 
     private LocalDate addedInterest = null;
 
     public CreditCard(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Money creditLimit, BigDecimal interestRate) {
         super(balance, primaryOwner, secondaryOwner);
         setCreditLimit(creditLimit);
-        this.interestRate = interestRate;
+        setInterestRate(interestRate);
     }
 
 
@@ -48,7 +45,7 @@ public class CreditCard extends Account{
     }
 
     public void setCreditLimit(Money creditLimit) {
-        if(creditLimit.getAmount().compareTo(new BigDecimal(100)) == -1 || creditLimit.getAmount().compareTo(new BigDecimal(100000)) == 1){
+        if(creditLimit.getAmount().compareTo(new BigDecimal(100)) == -1 || creditLimit.getAmount().compareTo(new BigDecimal(100000)) == 1 || creditLimit.getAmount() == null){
             this.creditLimit = new Money(new BigDecimal(100),Currency.getInstance("EUR"));
         } else {
             this.creditLimit = creditLimit;
@@ -61,7 +58,11 @@ public class CreditCard extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
+        if(interestRate.compareTo(new BigDecimal(0.2)) == 1 || interestRate.compareTo(new BigDecimal(0.1)) == -1 || interestRate == null) {
+            this.interestRate = new BigDecimal("0.2");
+        } else {
+            this.interestRate = interestRate;
+        }
     }
 
     public void setAddedInterest(LocalDate addedInterest) {

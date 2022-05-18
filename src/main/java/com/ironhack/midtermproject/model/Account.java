@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,10 +19,16 @@ public abstract class Account {
     private Long id;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="amount", column=@Column(name="balance_amount")),
+            @AttributeOverride(name="currency", column=@Column(name="balance_currency"))
+    })
+    @NotNull
     private Money balance;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="primary_owner_id")
+    @NotNull
     private AccountHolder primaryOwner;
 
     @OneToOne(fetch = FetchType.EAGER)
@@ -35,8 +42,7 @@ public abstract class Account {
     })
     private Money penaltyFee;
 
-    //private final Date creationDate = new Date();
-    private LocalDate creationDate = LocalDate.now();
+    private LocalDate creationDate;
 
 
     public Account() {
@@ -46,6 +52,7 @@ public abstract class Account {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
+        this.creationDate = LocalDate.now();
         this.penaltyFee = new Money(new BigDecimal("40"), Currency.getInstance("EUR"));
     }
 
