@@ -1,12 +1,16 @@
 package com.ironhack.midtermproject.DTO;
 
 import com.ironhack.midtermproject.model.Money;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public class ThirdPartyTransferDTO {
+    @NotNull
     private BigDecimal amount;
+    @NotNull
     private Long accountId;
+    @NotNull
     private String accountSecretKey;
 
     public ThirdPartyTransferDTO(BigDecimal amount, Long accountId, String accountSecretKey) {

@@ -26,12 +26,12 @@ public abstract class Account {
     @NotNull
     private Money balance;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="primary_owner_id")
     @NotNull
     private AccountHolder primaryOwner;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="secondary_owner_id")
     private AccountHolder secondaryOwner; //este tiene que ser opcional
 
@@ -97,4 +97,7 @@ public abstract class Account {
         return creationDate;
     }
 
+    public void setCreationDate(LocalDate creationDate) {
+        this.creationDate = creationDate;
+    }
 }

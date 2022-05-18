@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -58,7 +59,10 @@ public class ThirdPartyService {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided key does not match the account id");
             }
         }
+    }
 
-
+    public void deleteThirdParty(@RequestParam Long thirdPartyId){
+        ThirdParty thirdPartyFromDB= thirdPartyRepository.findById(thirdPartyId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Third Party not found"));
+        thirdPartyRepository.deleteById(thirdPartyId);
     }
 }

@@ -23,9 +23,15 @@ public class ThirdPartyController implements IThirdPartyController {
         thirdPartyService.saveThirdParty(thirdParty);
     }
 
-    @PostMapping("/thirdtransfer")
+    @PatchMapping("/thirdtransfer")
     @ResponseStatus(HttpStatus.OK)
     public void transferMoneyThirdParty(@RequestParam String hashedKey, @RequestBody ThirdPartyTransferDTO thirdPartyTransferDTO){
         thirdPartyService.transferMoneyThirdParty(hashedKey, thirdPartyTransferDTO);
+    }
+
+    @DeleteMapping("/thirdparties")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void deleteAccount(@RequestParam Long thirdPartyId){
+        thirdPartyService.deleteThirdParty(thirdPartyId);
     }
 }

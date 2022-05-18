@@ -41,8 +41,8 @@ public class AccountController implements IAccountController {
         accountService.createCreditAccount(creditAccountDTO);
     }
 
-    @PostMapping("/transfer")
-    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/transfer")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void transferMoney(@RequestBody OwnerTransferDTO ownerTransferDTO){
         accountService.transferMoney(ownerTransferDTO);
     }
@@ -50,20 +50,26 @@ public class AccountController implements IAccountController {
 
     @GetMapping("/balance") //esto el accountholder
     @ResponseStatus(HttpStatus.OK)
-    public Money getBalance(){
-        return accountService.getBalance();
+    public Money getBalance(@RequestParam Long accountId){
+        return accountService.getBalance(accountId);
     }
 
     @GetMapping("/adminbalance") //esto solo los admin
     @ResponseStatus(HttpStatus.OK)
-    public Money getBalanceA(@RequestParam Long accountId){
-        return accountService.getBalance(accountId);
+    public Money getBalanceAdmin(@RequestParam Long accountId){
+        return accountService.getBalanceAdmin(accountId);
     }
 
     @PatchMapping("/setbalance") //esto solo los admin
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeBalance(@RequestParam Long accountId,@RequestParam BigDecimal newBalance){
         accountService.changeBalance(accountId, newBalance);
+    }
+
+    @DeleteMapping("/account")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAccount(@RequestParam Long accountId){
+        accountService.deleteAccount(accountId);
     }
 
 

@@ -29,4 +29,10 @@ public class UserController implements IUserController {
     public void createAdmin(Admin admin){
         userService.createAdmin(admin);
     }
+
+    @DeleteMapping("/users")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void deleteUser(@RequestParam Long userId){
+        userService.deleteUser(userId);
+    }
 }

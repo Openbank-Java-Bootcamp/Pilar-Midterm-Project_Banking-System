@@ -1,26 +1,33 @@
 package com.ironhack.midtermproject.DTO;
 
 import com.ironhack.midtermproject.model.Money;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public class OwnerTransferDTO {
-    private BigDecimal amount;
+    @NotNull
+    private Money transferAmount;
+    @NotNull
     private String ownerTargetName;
+    @NotNull
     private Long targetAccountId;
+    @NotNull
+    private Long ownAccountId;
 
-    public OwnerTransferDTO(BigDecimal amount, String ownerTargetName, Long targetAccountId) {
-        this.amount = amount;
+    public OwnerTransferDTO(Money transferAmount, String ownerTargetName, Long targetAccountId, Long ownAccountId) {
+        this.transferAmount = transferAmount;
         this.ownerTargetName = ownerTargetName;
         this.targetAccountId = targetAccountId;
+        this.ownAccountId = ownAccountId;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public Money getTransferAmount() {
+        return transferAmount;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setTransferAmount(Money transferAmount) {
+        this.transferAmount = transferAmount;
     }
 
     public String getOwnerTargetName() {
@@ -37,5 +44,13 @@ public class OwnerTransferDTO {
 
     public void setTargetAccountId(Long targetAccountId) {
         this.targetAccountId = targetAccountId;
+    }
+
+    public Long getOwnAccountId() {
+        return ownAccountId;
+    }
+
+    public void setOwnAccountId(Long ownAccountId) {
+        this.ownAccountId = ownAccountId;
     }
 }

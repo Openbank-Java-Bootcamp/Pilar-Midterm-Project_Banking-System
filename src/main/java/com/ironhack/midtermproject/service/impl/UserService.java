@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.service.impl;
 
 import com.ironhack.midtermproject.model.AccountHolder;
 import com.ironhack.midtermproject.model.Admin;
+import com.ironhack.midtermproject.model.ThirdParty;
 import com.ironhack.midtermproject.model.User;
 import com.ironhack.midtermproject.repository.RoleRepository;
 import com.ironhack.midtermproject.repository.UserRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.BeanDefinitionDsl;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,11 +50,17 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     public AccountHolder createAccountHolder(AccountHolder accountHolder){
+
         return userRepository.save(accountHolder);
     }
 
     public Admin createAdmin(Admin admin){
         return userRepository.save(admin);
+    }
+
+    public void deleteUser(Long userId){
+        User userFromDB= userRepository.findById(userId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        userRepository.deleteById(userId);
     }
 
 
