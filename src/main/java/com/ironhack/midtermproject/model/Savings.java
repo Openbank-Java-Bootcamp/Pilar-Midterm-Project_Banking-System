@@ -26,7 +26,8 @@ public class Savings extends Account{
     })
     private Money minimumBalance;
 
-    @Digits(integer=1, fraction=4) //entero es 1 o 0???
+    @Digits(integer=5, fraction=4) //entero es 1 o 0???
+    @Column(precision=5,scale=4)
     private BigDecimal interestRate;
 
     private LocalDate addedInterest = null;
@@ -74,8 +75,8 @@ public class Savings extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        if(interestRate.compareTo(new BigDecimal(0.5)) == 1 || interestRate.compareTo(new BigDecimal(0)) == 0 || interestRate.compareTo(new BigDecimal(0)) == -1 || interestRate == null){
-            this.interestRate = new BigDecimal("0.0025");
+        if(interestRate.compareTo(BigDecimal.valueOf(0.5000)) == 1 || interestRate.compareTo(BigDecimal.ZERO) == 0 || interestRate.compareTo(BigDecimal.ZERO) == -1 || interestRate == null){
+            this.interestRate = BigDecimal.valueOf(0.0025);
         } else {
             this.interestRate = interestRate;
         }

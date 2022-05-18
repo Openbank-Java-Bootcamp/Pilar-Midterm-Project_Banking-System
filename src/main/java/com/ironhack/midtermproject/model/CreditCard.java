@@ -24,7 +24,7 @@ public class CreditCard extends Account{
     })
     private Money creditLimit;
 
-    @Digits(integer=1, fraction=1)  //entero es 1 o 0???
+    @Digits(integer=5, fraction=4)  //entero es 1 o 0???
     private BigDecimal interestRate;
 
     private LocalDate addedInterest = null;
@@ -58,8 +58,8 @@ public class CreditCard extends Account{
     }
 
     public void setInterestRate(BigDecimal interestRate) {
-        if(interestRate.compareTo(new BigDecimal(0.2)) == 1 || interestRate.compareTo(new BigDecimal(0.1)) == -1 || interestRate == null) {
-            this.interestRate = new BigDecimal("0.2");
+        if(interestRate.compareTo(BigDecimal.valueOf(0.2)) == 1 || interestRate.compareTo(BigDecimal.valueOf(0.1)) == -1 || interestRate == null) {
+            this.interestRate = BigDecimal.valueOf(0.2);
         } else {
             this.interestRate = interestRate;
         }

@@ -177,7 +177,7 @@ public class AccountService {
         accountRepository.save(targetAccount);
     }
 
-    public BigDecimal getBalance(){
+    public Money getBalance(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = null;
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
@@ -225,11 +225,11 @@ public class AccountService {
             }
         }
 
-        return currentAccount.getBalance().getAmount();
+        return currentAccount.getBalance();
 
     }
 
-    public BigDecimal getBalance(Long accountId){
+    public Money getBalance(Long accountId){
         Account accountFromDB = accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
         //si la cuenta es savings o credit comparar la fecha de hoy con la fecha de creacion o desde que fue agregado interes.
         //antes de devolver el balance ver si hay que agregar interes
@@ -265,7 +265,7 @@ public class AccountService {
             //me falta guardar la cuenta actualizada
             accountRepository.save(accountFromDB);
         }
-        return accountFromDB.getBalance().getAmount();
+        return accountFromDB.getBalance();
     }
 
     public void changeBalance(Long accountId, BigDecimal newBalance){

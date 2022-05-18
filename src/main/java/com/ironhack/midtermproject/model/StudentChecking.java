@@ -3,6 +3,7 @@ package com.ironhack.midtermproject.model;
 import com.ironhack.midtermproject.enums.Status;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
 
@@ -15,7 +16,7 @@ import java.util.Date;
 public class StudentChecking extends Account{
     private String secretKey;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
     public StudentChecking() {

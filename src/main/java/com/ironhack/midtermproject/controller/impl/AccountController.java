@@ -50,13 +50,13 @@ public class AccountController implements IAccountController {
 
     @GetMapping("/balance") //esto el accountholder
     @ResponseStatus(HttpStatus.OK)
-    public BigDecimal getBalance(){
+    public Money getBalance(){
         return accountService.getBalance();
     }
 
     @GetMapping("/adminbalance") //esto solo los admin
     @ResponseStatus(HttpStatus.OK)
-    public BigDecimal getBalanceA(@RequestParam Long accountId){
+    public Money getBalanceA(@RequestParam Long accountId){
         return accountService.getBalance(accountId);
     }
 
