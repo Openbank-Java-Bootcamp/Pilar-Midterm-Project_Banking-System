@@ -38,7 +38,7 @@ public class MidtermProjectApplication {
 			roleService.saveRole(new Role("ROLE_ACCOUNT_HOLDER"));
 			roleService.saveRole(new Role("ROLE_ADMIN"));
 
-			userService.saveUser(new AccountHolder("John Doe", "john", "1234", LocalDate.parse("2009-02-15"), new Address(),null));
+			userService.saveUser(new AccountHolder("John Doe", "john", "1234", LocalDate.parse("1995-02-15"), new Address(),null));
 			userService.saveUser(new AccountHolder("James Smith", "james", "1234", LocalDate.parse("2003-02-15"), new Address(),null));
 			userService.saveUser(new AccountHolder("Jane Carry", "jane", "1234", LocalDate.parse("2018-02-15"), new Address(),null));
 			userService.saveUser(new Admin("Chris Anderson", "chris", "1234"));
