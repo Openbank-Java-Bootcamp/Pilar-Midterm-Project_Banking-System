@@ -95,8 +95,17 @@ public class AccountService {
         BigDecimal maxDaily = transferRepository.findMaxDailyTransferAmount(currentAccount.getId());
         BigDecimal actualDaily = transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId());
         BigDecimal percentage = actualDaily.multiply(new BigDecimal(100).divide(maxDaily));
-        if(percentage.compareTo(new BigDecimal(150))==1){
-
+        if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof Savings){
+            ((Savings) currentAccount).setStatus(Status.FROZEN);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+        }
+        if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof Checking){
+            ((Checking) currentAccount).setStatus(Status.FROZEN);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+        }
+        if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof StudentChecking){
+            ((StudentChecking) currentAccount).setStatus(Status.FROZEN);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
         }
 
         //si no hay fraude, buscar la cuenta destino a ver si existe y entonces hacer la transferencia
