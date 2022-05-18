@@ -23,11 +23,11 @@ public class OwnerTransferDTO {
         this.amount = amount;
     }
 
-    public String getOwnerTargetId() {
+    public String getOwnerTargetName() {
         return ownerTargetName;
     }
 
-    public void setOwnerTargetId(String ownerTargetId) {
+    public void setOwnerTargetName(String ownerTargetId) {
         this.ownerTargetName = ownerTargetName;
     }
 

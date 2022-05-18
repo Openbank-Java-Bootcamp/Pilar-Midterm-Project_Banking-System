@@ -32,19 +32,19 @@ public class AccountController implements IAccountController {
 
     @PostMapping("/saving") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
-    public void createSavingsAccount(Savings savingsAccount){
+    public void createSavingsAccount(@RequestBody Savings savingsAccount){
         accountService.createSavingsAccount(savingsAccount);
     }
 
     @PostMapping("/credit") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCreditAccount(CreditCard creditAccount){
+    public void createCreditAccount(@RequestBody CreditCard creditAccount){
         accountService.createCreditAccount(creditAccount);
     }
 
     @PostMapping("/transfer")
     @ResponseStatus(HttpStatus.OK)
-    public void transferMoney(OwnerTransferDTO ownerTransferDTO){
+    public void transferMoney(@RequestBody OwnerTransferDTO ownerTransferDTO){
         accountService.transferMoney(ownerTransferDTO);
     }
 
@@ -55,15 +55,15 @@ public class AccountController implements IAccountController {
         return accountService.getBalance();
     }
 
-    @GetMapping("/balance/{Id}") //esto solo los admin
+    @GetMapping("/adminbalance") //esto solo los admin
     @ResponseStatus(HttpStatus.OK)
-    public BigDecimal getBalanceA(Long accountId){
+    public BigDecimal getBalanceA(@RequestParam Long accountId){
         return accountService.getBalance(accountId);
     }
 
     @PatchMapping("/setbalance") //esto solo los admin
     @ResponseStatus(HttpStatus.OK)
-    public void changeBalance(Long accountId, BigDecimal newBalance){
+    public void changeBalance(@RequestParam Long accountId,@RequestParam BigDecimal newBalance){
         accountService.changeBalance(accountId, newBalance);
     }
 

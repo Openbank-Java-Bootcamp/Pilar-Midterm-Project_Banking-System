@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -17,12 +18,12 @@ public class Transfer {
     private Long id;
     private Long fromAccountId;
     private BigDecimal amount;
-    private Date date;
+    private LocalDateTime date;
 
     public Transfer() {
     }
 
-    public Transfer(Long fromAccountId, BigDecimal amount, Date date) {
+    public Transfer(Long fromAccountId, BigDecimal amount, LocalDateTime date) {
         this.fromAccountId = fromAccountId;
         this.amount = amount;
         this.date = date;
@@ -53,11 +54,11 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 }

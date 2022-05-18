@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.service.impl;
 
 
 import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
+import com.ironhack.midtermproject.enums.Status;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
 import com.ironhack.midtermproject.repository.TransferRepository;
@@ -18,8 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
@@ -72,10 +72,39 @@ public class AccountService {
         if(currentAccount == null){
             currentAccount = accountRepository.findBySecondaryOwnerId(accountHolderId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         }
-        //buscar la cuenta destino antes de hacer la transferencia
+
+        //comprobar fraude antes de hacer transfer
+        LocalDateTime lastTransferDate = transferRepository.findLastTransferDateByAccountId(currentAccount.getId());
+        Duration duration = Duration.between(LocalDateTime.now(), lastTransferDate);
+        if(currentAccount instanceof Savings && duration.getSeconds()<= 1){
+            ((Savings) currentAccount).setStatus(Status.FROZEN);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+        }
+        if(currentAccount instanceof StudentChecking && duration.getSeconds()<= 1){
+            ((StudentChecking) currentAccount).setStatus(Status.FROZEN);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+        }
+        if(currentAccount instanceof Checking && duration.getSeconds()<= 1){
+            ((Checking) currentAccount).setStatus(Status.FROZEN);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+        }
+
+        //tengo que agrupar por dia y calcular el maximo amount transferido en un dia,
+        // y comparar con el total del dia en que se esta haciendo la transferencia.
+
+        BigDecimal maxDaily = transferRepository.findMaxDailyTransferAmount(currentAccount.getId());
+        BigDecimal actualDaily = transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId());
+        BigDecimal percentage = actualDaily.multiply(new BigDecimal(100).divide(maxDaily));
+        if(percentage.compareTo(new BigDecimal(150))==1){
+
+        }
+
+        //si no hay fraude, buscar la cuenta destino a ver si existe y entonces hacer la transferencia
         Account targetAccount = accountRepository.findById(ownerTransferDTO.getTargetAccountId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
-        if(targetAccount.getPrimaryOwner().equals(ownerTransferDTO.getOwnerTargetId()) || targetAccount.getSecondaryOwner().equals(ownerTransferDTO.getOwnerTargetId())){
-            //ahora intentar la transferencia
+
+        if(!targetAccount.getPrimaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()) && (targetAccount.getSecondaryOwner() == null || !targetAccount.getSecondaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()))){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided id or owner of the target account is wrong");
+        } else {
             BigDecimal actualBalance = currentAccount.getBalance().getAmount();
             if(actualBalance.compareTo(ownerTransferDTO.getAmount()) == -1){
                 throw new IllegalArgumentException("Not sufficient funds");
@@ -83,9 +112,8 @@ public class AccountService {
                 currentAccount.setBalance(new Money(actualBalance.subtract(ownerTransferDTO.getAmount()),Currency.getInstance("EUR")));
                 targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().add(ownerTransferDTO.getAmount()),Currency.getInstance("EUR")));
             }
-        } else {
-            throw new IllegalArgumentException("The provided id or owner of the target account is wrong");
         }
+
         //tambien necesito saber el tipo de la cuenta de origen para ver si baja del minimumbalance
         if(currentAccount instanceof Savings && currentAccount.getBalance().getAmount().compareTo(((Savings) currentAccount).getMinimumBalance().getAmount()) == -1){
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()),currentAccount.getBalance().getCurrency()));
@@ -93,12 +121,10 @@ public class AccountService {
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()),currentAccount.getBalance().getCurrency()));
         }
 
-        //comprobar fraude, cada vez que se hace una transferencia agregarla a la tabla transfer
-        Transfer transfer = new Transfer(currentAccount.getId(),ownerTransferDTO.getAmount(),new Date());
-        transferRepository.save(transfer);
 
-        //tengo que agrupar por dia y calcular el maximo amount transferido en un dia, y comparar con el total del dia en que se esta haciendo la transferencia.
-        //tambien comparar la diferencia de tiempo con la ultima transferencia, seleccionar la fecha mas grande¿¿???
+        //cada vez que se hace una transferencia agregarla a la tabla transfer
+        Transfer transfer = new Transfer(currentAccount.getId(),ownerTransferDTO.getAmount(), LocalDateTime.now());
+        transferRepository.save(transfer);
 
 
         //me falta guardar las cuentas actualizadas tambien
