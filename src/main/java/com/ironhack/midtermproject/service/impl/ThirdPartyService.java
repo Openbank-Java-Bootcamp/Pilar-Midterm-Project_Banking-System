@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -61,8 +62,33 @@ public class ThirdPartyService {
         }
     }
 
+    public void takeMoneyThirdParty(String hashedKey, ThirdPartyTransferDTO thirdPartyTransferDTO){
+        List<ThirdParty> listFromDB = thirdPartyRepository.findAll();
+        boolean existThirdParty = false;
+        for (ThirdParty i : listFromDB){
+            if(passwordEncoder.matches(hashedKey, i.getHashedKey())){
+                existThirdParty = true;
+                break;
+            }
+        }
+        if(!existThirdParty){
+            throw new IllegalArgumentException("The provided hashedKey is incorrect");
+        } else {
+            Long targetAccountId = thirdPartyTransferDTO.getAccountId();
+            Account targetAccount = accountRepository.findById(targetAccountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+            String secretKey = accountRepository.findSecretKeyByAccountId(targetAccountId);
+            if(secretKey.equals(thirdPartyTransferDTO.getAccountSecretKey())){
+                targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().subtract(thirdPartyTransferDTO.getAmount()), Currency.getInstance("EUR")));
+                accountRepository.save(targetAccount);
+            } else{
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided key does not match the account id");
+            }
+        }
+    }
+
     public void deleteThirdParty(@RequestParam Long thirdPartyId){
         ThirdParty thirdPartyFromDB= thirdPartyRepository.findById(thirdPartyId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Third Party not found"));
         thirdPartyRepository.deleteById(thirdPartyId);
     }
+
 }
