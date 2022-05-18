@@ -43,7 +43,10 @@ public class AccountService {
 
     public Account createCheckingAccount(CheckingAccountDTO checkingAccountDTO){
         User primaryOwner =userRepository.findById(checkingAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
-        User secondaryOwner = userRepository.findById(checkingAccountDTO.getPrimaryAccountOwnerId()).orElse(null);
+        User secondaryOwner = null;
+        if(checkingAccountDTO.getSecondaryAccountOwnerId() != null){
+            secondaryOwner = userRepository.findById(checkingAccountDTO.getSecondaryAccountOwnerId()).orElse(null);
+        }
         if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
             LocalDate dob = ((AccountHolder) primaryOwner).getDateOfBirth();
             LocalDate now = LocalDate.now();
@@ -65,7 +68,10 @@ public class AccountService {
 
     public Savings createSavingsAccount(SavingAccountDTO savingAccountDTO){
         User primaryOwner =  userRepository.findById(savingAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
-        User secondaryOwner = userRepository.findById(savingAccountDTO.getPrimaryAccountOwnerId()).orElse(null);
+        User secondaryOwner = null;
+        if(savingAccountDTO.getSecondaryAccountOwnerId() != null){
+           secondaryOwner = userRepository.findById(savingAccountDTO.getSecondaryAccountOwnerId()).orElse(null);
+        }
         if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
             Savings savingAccount = new Savings(savingAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner, savingAccountDTO.getSecretKey(),savingAccountDTO.getMinimumBalance(), savingAccountDTO.getInterestRate());
             return accountRepository.save(savingAccount);
@@ -78,7 +84,10 @@ public class AccountService {
 
     public CreditCard createCreditAccount(CreditAccountDTO creditAccountDTO){
         User primaryOwner =  userRepository.findById(creditAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
-        User secondaryOwner = userRepository.findById(creditAccountDTO.getPrimaryAccountOwnerId()).orElse(null);
+        User secondaryOwner = null;
+        if(creditAccountDTO.getSecondaryAccountOwnerId() != null){
+            secondaryOwner = userRepository.findById(creditAccountDTO.getSecondaryAccountOwnerId()).orElse(null);
+        }
         if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
             CreditCard creditAccount = new CreditCard(creditAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner,creditAccountDTO.getCreditLimit(), creditAccountDTO.getInterestRate());
             return accountRepository.save(creditAccount);
@@ -97,7 +106,7 @@ public class AccountService {
         Long accountHolderId = currentUser.getId();
         Account currentAccount = accountRepository.findByPrimaryOwnerId(accountHolderId).orElse(null);
         if(currentAccount == null){
-            currentAccount = accountRepository.findBySecondaryOwnerId(accountHolderId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+            currentAccount = accountRepository.findBySecondaryOwnerId(accountHolderId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Are you sure you have an account?"));
         }
 
         //comprobar fraude antes de hacer transfer
