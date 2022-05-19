@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class RoleControllerTest {
 
     @Autowired
@@ -69,12 +71,21 @@ class RoleControllerTest {
     }
 
     @Test
-    void addRoleToUser_Valid_NotContent() throws Exception {
+    void addRoleToUser_Valid_NoContent() throws Exception {
         RoleToUserDTO roleToUser = new RoleToUserDTO("jose","ROLE_ADMIN");
         String body = objectMapper.writeValueAsString(roleToUser);
         MvcResult mvcResult = mockMvc.perform(post("/api/roletouser")
                 .content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
+    }
+
+    @Test
+    void addRoleToUser_NotValidUsername_NotFound() throws Exception {
+        RoleToUserDTO roleToUser = new RoleToUserDTO("paracucho","ROLE_ADMIN");
+        String body = objectMapper.writeValueAsString(roleToUser);
+        MvcResult mvcResult = mockMvc.perform(post("/api/roletouser")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
     }
 
 }

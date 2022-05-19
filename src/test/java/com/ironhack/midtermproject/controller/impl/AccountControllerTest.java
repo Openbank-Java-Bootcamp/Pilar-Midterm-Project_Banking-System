@@ -8,6 +8,8 @@ import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
 import com.ironhack.midtermproject.DTO.SavingAccountDTO;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.*;
+import com.ironhack.midtermproject.service.impl.ThirdPartyService;
+import com.ironhack.midtermproject.service.impl.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest
+@ActiveProfiles("test")
 class AccountControllerTest {
 
     @Autowired
@@ -44,7 +48,13 @@ class AccountControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private ThirdPartyRepository thirdPartyRepository;
+
+    @Autowired
+    private ThirdPartyService thirdPartyService;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -66,12 +76,12 @@ class AccountControllerTest {
         Address address1 = new Address("Passatge Flaugier 6","08041","Barcelona");
         Address address2 = new Address("Carrer de Rogent","08041","Barcelona");
 
-        User user1 = new AccountHolder("Pilar Alvarez","pili","1234", LocalDate.parse("2007-01-15"),address1,null);
-        User user2 = new AccountHolder("Macarena Garcia","maqui","1234", LocalDate.parse("1989-01-07"),address2,null);
-        User user3 = new AccountHolder("Paula Lopez","pauli","1234", LocalDate.parse("2005-01-15"),address1,null);
-        User user4 = new Admin("Jose Perez","jose","1234");
+        User user1 = userService.createAccountHolder(new AccountHolder("Pilar Alvarez","pili","1234", LocalDate.parse("2007-01-15"),address1,null));
+        User user2 = userService.createAccountHolder(new AccountHolder("Macarena Garcia","maqui","1234", LocalDate.parse("1989-01-07"),address2,null));
+        User user3 = userService.createAccountHolder(new AccountHolder("Paula Lopez","pauli","1234", LocalDate.parse("2005-01-15"),address1,null));
+        User user4 = userService.createAdmin(new Admin("Jose Perez","jose","1234"));
 
-        ThirdParty tp1 = new ThirdParty("Pedro Gomez", "1234");
+        ThirdParty tp1 = thirdPartyService.saveThirdParty(new ThirdParty("Pedro Gomez", "1234"));
 
         Role role1 = new Role("ROLE_ACCOUNT_HOLDER");
         Role role2 = new Role("ROLE_ADMIN");
@@ -161,38 +171,58 @@ class AccountControllerTest {
     }
 
 
-    //no me funcionan las de transfer
-    //Expected :204
-    //Actual   :404 not found
     @Test
     @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
-    //@WithMockUser(username="admin",roles={"USER","ADMIN"})
     void transferMoney_Valid_NotContent() throws Exception {
-        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(50), Currency.getInstance("EUR")), "Paula Lopez", 2L,1L);
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(50), Currency.getInstance("EUR")), "Macarena Garcia", 2L,1L);
         String body = objectMapper.writeValueAsString(o);
-        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer") //.with(user("pili"))
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
                 .content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
     }
 
 
-    //no me funcionan las de transfer
-    //Expected :404
-    //Actual   :405
     @Test
     @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
-        //@WithMockUser(username="admin",roles={"USER","ADMIN"})
-    void transferMoney_NotValidOwnAccountId_NotContent() throws Exception {
+    void transferMoney_AmountGraterThanBalance_NotContent() throws Exception {
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(600), Currency.getInstance("EUR")), "Macarena Garcia", 2L,1L);
+        String body = objectMapper.writeValueAsString(o);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "pauli", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    void transferMoney_AmountGraterThanCredit_Forbidden() throws Exception {
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(2000), Currency.getInstance("EUR")), "Macarena Garcia", 2L,6L);
+        String body = objectMapper.writeValueAsString(o);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden()).andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    void transferMoney_NotValidOwnAccountId_NotFound() throws Exception {
         OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), "Paula Lopez", 4L,15L);
         String body = objectMapper.writeValueAsString(o);
-        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer") //.with(user("pili"))
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
                 .content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
     }
 
-    //no me funcionan las de transfer
-    //Expected :200
-    //Actual   :404
+    @Test
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    void transferMoney_NotAnAccountIdOwned_NotFound() throws Exception {
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), "Paula Lopez", 4L,6L);
+        String body = objectMapper.writeValueAsString(o);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
+    }
+
+
     @Test
     @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
     void getBalance_Valid_MoneyObject() throws Exception {
@@ -206,17 +236,17 @@ class AccountControllerTest {
     }
 
 
-    //no me funcionan las de transfer
+    //no esta funcionando lo de los intereses
     @Test
-    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    @WithMockUser(username = "pauli", password = "1234", roles = {"ACCOUNT_HOLDER"})
     void getBalance_NoInterestAdded_InterestAdded() throws Exception {
         MvcResult mcvResult = mockMvc.perform(get("/api/balance")
-                        .queryParam("accountId", "1")
+                        .queryParam("accountId", "6")
                 )
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        assertTrue(mcvResult.getResponse().getContentAsString().contains(""));
+        assertTrue(mcvResult.getResponse().getContentAsString().contains("520"));
     }
 
     @Test
@@ -230,8 +260,9 @@ class AccountControllerTest {
         assertTrue(mcvResult.getResponse().getContentAsString().contains("500"));
     }
 
-    //no me funciona, cambie la fecha de creacion y no me añade intereses
-    /*@Test
+
+
+    @Test
     void getBalanceAdmin_NotAddedInterest_MoneyObject() throws Exception {
         MvcResult mcvResult = mockMvc.perform(get("/api/adminbalance")
                         .queryParam("accountId", "5")
@@ -239,13 +270,12 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        assertTrue(mcvResult.getResponse().getContentAsString().contains("500")); //no se me añaden los intereses
-    }*/
+        assertTrue(mcvResult.getResponse().getContentAsString().contains("600")); //no se me añaden los intereses
+    }
 
 
     @Test
     void changeBalance_Valid_StatusNoContent() throws Exception {
-        //accountId, newBalance
         MvcResult mcvResult = mockMvc.perform(patch("/api/setbalance")
                         .queryParam("accountId", "2")
                         .queryParam("newBalance", "1000")
@@ -255,7 +285,6 @@ class AccountControllerTest {
 
     @Test
     void changeBalance_NotValidId_StatusNotFound() throws Exception {
-        //accountId, newBalance
         MvcResult mcvResult = mockMvc.perform(patch("/api/setbalance")
                         .queryParam("accountId", "20")
                         .queryParam("newBalance", "1000")

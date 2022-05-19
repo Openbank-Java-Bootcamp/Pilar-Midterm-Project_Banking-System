@@ -5,6 +5,7 @@ import com.ironhack.midtermproject.DTO.CheckingAccountDTO;
 import com.ironhack.midtermproject.DTO.ThirdPartyTransferDTO;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.*;
+import com.ironhack.midtermproject.service.impl.ThirdPartyService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,11 +29,11 @@ import java.util.Currency;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class ThirdPartyControllerTest {
     @Autowired
     private AccountRepository accountRepository;
@@ -47,6 +49,9 @@ class ThirdPartyControllerTest {
 
     @Autowired
     private TransferRepository transferRepository;
+
+    @Autowired
+    private ThirdPartyService thirdPartyService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -67,7 +72,7 @@ class ThirdPartyControllerTest {
         User user3 = new AccountHolder("Paula Lopez","pauli","1234", LocalDate.parse("2005-01-15"),address1,null);
         User user4 = new Admin("Jose Perez","jose","1234");
 
-        ThirdParty tp1 = new ThirdParty("Pedro Gomez", "1234");
+        ThirdParty tp1 = thirdPartyService.saveThirdParty(new ThirdParty("Pedro Gomez", "1234"));
 
         Role role1 = new Role("ROLE_ACCOUNT_HOLDER");
         Role role2 = new Role("ROLE_ADMIN");
@@ -111,15 +116,8 @@ class ThirdPartyControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andReturn();
     }
 
-    /*@PatchMapping("/thirdtransfer")
-    @ResponseStatus(HttpStatus.OK)
-    public void transferMoneyThirdParty(@RequestParam String hashedKey, @RequestBody ThirdPartyTransferDTO thirdPartyTransferDTO){
-        thirdPartyService.transferMoneyThirdParty(hashedKey, thirdPartyTransferDTO);
-    }*/
-
 
     @Test
-        //IllegalArgumentException: The provided hashedKey is incorrect
     void transferMoneyThirdParty_Valid_Ok() throws Exception {
         ThirdPartyTransferDTO tpt = new ThirdPartyTransferDTO(BigDecimal.valueOf(50),1L,"1234");
         String body = objectMapper.writeValueAsString(tpt);
@@ -129,18 +127,60 @@ class ThirdPartyControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
     }
 
-
-   /* @PatchMapping("/thirdtake")
-    @ResponseStatus(HttpStatus.OK)
-    public void takeMoneyThirdParty(@RequestParam String hashedKey, @RequestBody ThirdPartyTransferDTO thirdPartyTransferDTO){
-        thirdPartyService.takeMoneyThirdParty(hashedKey, thirdPartyTransferDTO);
-    }*/
-
- /*   @DeleteMapping("/thirdparties")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void deleteAccount(@RequestParam Long thirdPartyId){
-        thirdPartyService.deleteThirdParty(thirdPartyId);
+    @Test
+    void transferMoneyThirdParty_NotValidHashedKey_NotFound() throws Exception {
+        ThirdPartyTransferDTO tpt = new ThirdPartyTransferDTO(BigDecimal.valueOf(50),1L,"1234");
+        String body = objectMapper.writeValueAsString(tpt);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/thirdtransfer")
+                .queryParam("hashedKey", "1284")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
     }
-}*/
+
+    @Test
+    void transferMoneyThirdParty_NotMatchingKeyAndIdAccount_NotFound() throws Exception {
+        ThirdPartyTransferDTO tpt = new ThirdPartyTransferDTO(BigDecimal.valueOf(50),1L,"1274");
+        String body = objectMapper.writeValueAsString(tpt);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/thirdtransfer")
+                .queryParam("hashedKey", "1284")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
+    }
+
+    @Test
+    void takeMoneyThirdParty_Valid_Ok() throws Exception {
+        ThirdPartyTransferDTO tpt = new ThirdPartyTransferDTO(BigDecimal.valueOf(50),1L,"1234");
+        String body = objectMapper.writeValueAsString(tpt);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/thirdtake")
+                .queryParam("hashedKey", "1234")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
+    }
+
+    @Test
+    void takeMoneyThirdParty_NoValidHashedKey_NotFound() throws Exception {
+        ThirdPartyTransferDTO tpt = new ThirdPartyTransferDTO(BigDecimal.valueOf(50),1L,"1234");
+        String body = objectMapper.writeValueAsString(tpt);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/thirdtake")
+                .queryParam("hashedKey", "1254")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
+    }
+
+    @Test
+    void deleteAThirdParty_Valid_Accepted() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(delete("/api/thirdparties")
+                        .queryParam("thirdPartyId", "1")
+                )
+                .andExpect(status().isAccepted()).andReturn();
+    }
+
+    @Test
+    void deleteAThirdParty_NotValidId_NotFound() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(delete("/api/thirdparties")
+                        .queryParam("thirdPartyId", "10")
+                )
+                .andExpect(status().isNotFound()).andReturn();
+    }
 
 }

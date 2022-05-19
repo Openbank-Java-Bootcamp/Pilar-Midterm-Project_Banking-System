@@ -37,7 +37,7 @@ public class ThirdPartyController implements IThirdPartyController {
 
     @DeleteMapping("/thirdparties")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void deleteAccount(@RequestParam Long thirdPartyId){
+    public void deleteThirdParty(@RequestParam Long thirdPartyId){
         thirdPartyService.deleteThirdParty(thirdPartyId);
     }
 }

@@ -48,7 +48,7 @@ public class ThirdPartyService {
             }
         }
         if(!existThirdParty){
-            throw new IllegalArgumentException("The provided hashedKey is incorrect");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided hashedKey is incorrect");
         } else {
             Long targetAccountId = thirdPartyTransferDTO.getAccountId();
             Account targetAccount = accountRepository.findById(targetAccountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
@@ -72,7 +72,7 @@ public class ThirdPartyService {
             }
         }
         if(!existThirdParty){
-            throw new IllegalArgumentException("The provided hashedKey is incorrect");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided key does not match the account id");
         } else {
             Long targetAccountId = thirdPartyTransferDTO.getAccountId();
             Account targetAccount = accountRepository.findById(targetAccountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));

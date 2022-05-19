@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.*;
 import java.util.Calendar;
 import java.util.Currency;
@@ -169,9 +170,9 @@ public class AccountService {
             BigDecimal actualBalance = currentAccount.getBalance().getAmount();
             BigDecimal amountToTransfer = ownerTransferDTO.getTransferAmount().getAmount();
             if(currentAccount instanceof CreditCard && actualBalance.subtract(amountToTransfer).compareTo(((CreditCard) currentAccount).getCreditLimit().getAmount().negate()) == -1){
-                throw new IllegalArgumentException("You have reached your credit limit");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You have reached your credit limit");
             }else if(!(currentAccount instanceof CreditCard) && actualBalance.compareTo(amountToTransfer) == -1){
-                throw new IllegalArgumentException("Not sufficient funds");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You have reached your credit limit");
             } else {
                 currentAccount.setBalance(new Money(actualBalance.subtract(ownerTransferDTO.getTransferAmount().getAmount()),Currency.getInstance("EUR")));
                 targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().add(ownerTransferDTO.getTransferAmount().getAmount()),Currency.getInstance("EUR")));
@@ -196,6 +197,8 @@ public class AccountService {
         accountRepository.save(targetAccount);
     }
 
+
+
     public Money getBalance(Long accountId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = null;
@@ -210,9 +213,12 @@ public class AccountService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This is not your account");
         }
 
-        //si la cuenta es savings o credit comparar la fecha de hoy con la fecha de creacion o desde que fue agregado interes.
-        //antes de devolver el balance ver si hay que agregar interes
-        //si la cuenta es checking ver si se cobro el interes mensual
+        checkInterestAndMaintenance(currentAccount);
+
+        return currentAccount.getBalance();
+    }
+
+    public void checkInterestAndMaintenance(Account currentAccount){
         if(currentAccount instanceof Savings) {
             LocalDate toCompare = null;
             if(((Savings) currentAccount).getAddedInterest() == null){
@@ -220,89 +226,67 @@ public class AccountService {
             } else {
                 toCompare = ((Savings) currentAccount).getAddedInterest();
             }
-            int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            int years = (int) Math.floor(months/12);
-            BigDecimal interest = currentAccount.getBalance().getAmount().multiply(((Savings) currentAccount).getInterestRate()).multiply(BigDecimal.valueOf(years));
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest),Currency.getInstance("EUR")));
-            //guardar la cuenta actualizada
-            accountRepository.save(currentAccount);
-        } else if(currentAccount instanceof CreditCard){
+            Period period = Period.between(toCompare, LocalDate.now());
+            int years = Math.abs(period.getYears());
+            int months = Math.abs(period.getMonths());
+            int days = Math.abs(period.getDays());
+
+            if(years>0) {
+                BigDecimal interest = currentAccount.getBalance().getAmount().multiply(((Savings) currentAccount).getInterestRate()).multiply(BigDecimal.valueOf(years));
+                currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest), Currency.getInstance("EUR")));
+                ((Savings) currentAccount).setAddedInterest(LocalDate.now());
+                accountRepository.save(currentAccount);
+            }
+        }
+        if(currentAccount instanceof CreditCard){
             LocalDate toCompare = null;
             if(((CreditCard) currentAccount).getAddedInterest() == null){
                 toCompare = currentAccount.getCreationDate();
             } else {
                 toCompare = ((CreditCard) currentAccount).getAddedInterest();
             }
-            int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            BigDecimal monthRate = ((CreditCard) currentAccount).getInterestRate().divide(new BigDecimal(12),2,HALF_EVEN);
-            BigDecimal interest = currentAccount.getBalance().getAmount().multiply(monthRate).multiply(BigDecimal.valueOf(months));
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest),Currency.getInstance("EUR")));
-            //guardar la cuenta actualizada
-            accountRepository.save(currentAccount);
-        } else if(currentAccount instanceof Checking){
+            Period period = Period.between(toCompare, LocalDate.now());
+            int years = Math.abs(period.getYears());
+            int months = Math.abs(period.getMonths());
+            int days = Math.abs(period.getDays());
+            int totalDiffMonths= months + years/12;
 
+            if(totalDiffMonths>=1) {
+                BigDecimal monthRate = ((CreditCard) currentAccount).getInterestRate().divide(new BigDecimal(12), 2, RoundingMode.CEILING);
+                BigDecimal interest = currentAccount.getBalance().getAmount().multiply(monthRate).multiply(BigDecimal.valueOf(months));
+                currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest), Currency.getInstance("EUR")));
+                ((CreditCard) currentAccount).setAddedInterest(LocalDate.now());
+                accountRepository.save(currentAccount);
+            }
+        }
+        if(currentAccount instanceof Checking){
             LocalDate toCompare = null;
             if(((Checking) currentAccount).getMaintenanceCharged() == null){
                 toCompare = currentAccount.getCreationDate();
             } else {
                 toCompare = ((Checking) currentAccount).getMaintenanceCharged();
             }
-            int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            BigDecimal totalMaintenance = ((Checking) currentAccount).getMonthlyMaintenanceFee().getAmount().multiply(BigDecimal.valueOf(months));
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(totalMaintenance),Currency.getInstance("EUR")));
-            //me falta guardar la cuenta actualizada
-            accountRepository.save(currentAccount);
-        }
+            Period period = Period.between(toCompare, LocalDate.now());
+            int years = Math.abs(period.getYears());
+            int months = Math.abs(period.getMonths());
+            int days = Math.abs(period.getDays());
+            int totalDiffMonths= months + years/12;
 
-        return currentAccount.getBalance();
+            if(totalDiffMonths>=1) {
+                BigDecimal totalMaintenance = ((Checking) currentAccount).getMonthlyMaintenanceFee().getAmount().multiply(BigDecimal.valueOf(months));
+                currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(totalMaintenance), Currency.getInstance("EUR")));
+                ((Checking) currentAccount).setMaintenanceCharged(LocalDate.now());
+                accountRepository.save(currentAccount);
+            }
+        }
 
     }
 
     public Money getBalanceAdmin(Long accountId){
         Account currentAccount = accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
-        //si la cuenta es savings o credit comparar la fecha de hoy con la fecha de creacion o desde que fue agregado interes.
-        //antes de devolver el balance ver si hay que agregar interes
-        //si la cuenta es checking ver si se cobro el interes mensual
-        if(currentAccount instanceof Savings) {
-            LocalDate toCompare = null;
-            if(((Savings) currentAccount).getAddedInterest() == null){
-                toCompare = currentAccount.getCreationDate();
-            } else {
-                toCompare = ((Savings) currentAccount).getAddedInterest();
-            }
-            int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            int years = (int) Math.floor(months/12);
-            BigDecimal interest = currentAccount.getBalance().getAmount().multiply(((Savings) currentAccount).getInterestRate()).multiply(BigDecimal.valueOf(years));
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest),Currency.getInstance("EUR")));
-            //guardar la cuenta actualizada
-            accountRepository.save(currentAccount);
-        } else if(currentAccount instanceof CreditCard){
-            LocalDate toCompare = null;
-            if(((CreditCard) currentAccount).getAddedInterest() == null){
-                toCompare = currentAccount.getCreationDate();
-            } else {
-                toCompare = ((CreditCard) currentAccount).getAddedInterest();
-            }
-            int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            BigDecimal monthRate = ((CreditCard) currentAccount).getInterestRate().divide(new BigDecimal(12));
-            BigDecimal interest = currentAccount.getBalance().getAmount().multiply(monthRate).multiply(BigDecimal.valueOf(months));
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest),Currency.getInstance("EUR")));
-            //guardar la cuenta actualizada
-            accountRepository.save(currentAccount);
-        } else if(currentAccount instanceof Checking){
 
-            LocalDate toCompare = null;
-            if(((Checking) currentAccount).getMaintenanceCharged() == null){
-                toCompare = currentAccount.getCreationDate();
-            } else {
-                toCompare = ((Checking) currentAccount).getMaintenanceCharged();
-            }
-            int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            BigDecimal totalMaintenance = ((Checking) currentAccount).getMonthlyMaintenanceFee().getAmount().multiply(BigDecimal.valueOf(months));
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(totalMaintenance),Currency.getInstance("EUR")));
-            //me falta guardar la cuenta actualizada
-            accountRepository.save(currentAccount);
-        }
+        checkInterestAndMaintenance(currentAccount);
+
         return currentAccount.getBalance();
     }
 
