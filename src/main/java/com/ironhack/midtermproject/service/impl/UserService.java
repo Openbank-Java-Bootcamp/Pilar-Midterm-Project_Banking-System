@@ -46,13 +46,21 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     public AccountHolder createAccountHolder(AccountHolder accountHolder){
-        log.info("Saving a new user {} inside of the database", accountHolder.getName());  //inside {} the name of the user is shown
+        User userFromDB = userRepository.findByUsername(accountHolder.getUsername());
+        if(userFromDB != null){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Username already exists");
+        }
+        log.info("Saving a new user {} inside of the database", accountHolder.getName());
         accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));
         return userRepository.save(accountHolder);
     }
 
     public Admin createAdmin(Admin admin){
-        log.info("Saving a new user {} inside of the database", admin.getName());  //inside {} the name of the user is shown
+        User userFromDB = userRepository.findByUsername(admin.getUsername());
+        if(userFromDB != null){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Username already exists");
+        }
+        log.info("Saving a new user {} inside of the database", admin.getName());
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         return userRepository.save(admin);
     }

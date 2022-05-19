@@ -2,14 +2,15 @@ package com.ironhack.midtermproject.DTO;
 
 import com.ironhack.midtermproject.model.Money;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public class CreditAccountDTO {
-    @NotNull
+    @NotBlank(message = "Transfer amount may not be blank")
     private Money balance;
-    @NotNull
+    @NotBlank(message = "Name of the owner of the account may not be blank")
     private Long primaryAccountOwnerId;
     private Long secondaryAccountOwnerId;
     private Money creditLimit;

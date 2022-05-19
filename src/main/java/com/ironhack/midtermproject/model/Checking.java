@@ -46,7 +46,7 @@ public class Checking extends Account {
         this.status = status;
         this.minimumBalance = new Money(BigDecimal.valueOf(250), Currency.getInstance("EUR"));
         this.monthlyMaintenanceFee = new Money(BigDecimal.valueOf(12),Currency.getInstance("EUR"));
-        this.maintenanceCharged = null;
+        this.maintenanceCharged = LocalDate.now();
     }
 
     public String getSecretKey() {

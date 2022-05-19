@@ -25,25 +25,25 @@ public class AccountController implements IAccountController {
 
     @PostMapping("/checking")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCheckingAccount(@RequestBody CheckingAccountDTO checkingAccountDTO){
+    public void createCheckingAccount(@RequestBody @Valid CheckingAccountDTO checkingAccountDTO){
         accountService.createCheckingAccount(checkingAccountDTO);
     }
 
     @PostMapping("/saving") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
-    public void createSavingsAccount(@RequestBody SavingAccountDTO savingAccountDTO){
+    public void createSavingsAccount(@RequestBody @Valid SavingAccountDTO savingAccountDTO){
         accountService.createSavingsAccount(savingAccountDTO);
     }
 
     @PostMapping("/credit") //only admin??
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCreditAccount(@RequestBody CreditAccountDTO creditAccountDTO){
+    public void createCreditAccount(@RequestBody @Valid CreditAccountDTO creditAccountDTO){
         accountService.createCreditAccount(creditAccountDTO);
     }
 
     @PatchMapping("/transfer")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void transferMoney(@RequestBody OwnerTransferDTO ownerTransferDTO){
+    public void transferMoney(@RequestBody @Valid OwnerTransferDTO ownerTransferDTO){
         accountService.transferMoney(ownerTransferDTO);
     }
 

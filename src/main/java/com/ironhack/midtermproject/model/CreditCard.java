@@ -27,12 +27,13 @@ public class CreditCard extends Account{
     @Digits(integer=5, fraction=4)  //entero es 1 o 0???
     private BigDecimal interestRate;
 
-    private LocalDate addedInterest = null;
+    private LocalDate addedInterest;
 
     public CreditCard(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Money creditLimit, BigDecimal interestRate) {
         super(balance, primaryOwner, secondaryOwner);
         setCreditLimit(creditLimit);
         setInterestRate(interestRate);
+        this.addedInterest = LocalDate.now();
     }
 
 

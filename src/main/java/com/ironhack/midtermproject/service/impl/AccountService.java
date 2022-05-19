@@ -220,13 +220,7 @@ public class AccountService {
 
     public void checkInterestAndMaintenance(Account currentAccount){
         if(currentAccount instanceof Savings) {
-            LocalDate toCompare = null;
-            if(((Savings) currentAccount).getAddedInterest() == null){
-                toCompare = currentAccount.getCreationDate();
-            } else {
-                toCompare = ((Savings) currentAccount).getAddedInterest();
-            }
-            Period period = Period.between(toCompare, LocalDate.now());
+            Period period = Period.between(((Savings) currentAccount).getAddedInterest(), LocalDate.now());
             int years = Math.abs(period.getYears());
             int months = Math.abs(period.getMonths());
             int days = Math.abs(period.getDays());
@@ -239,13 +233,7 @@ public class AccountService {
             }
         }
         if(currentAccount instanceof CreditCard){
-            LocalDate toCompare = null;
-            if(((CreditCard) currentAccount).getAddedInterest() == null){
-                toCompare = currentAccount.getCreationDate();
-            } else {
-                toCompare = ((CreditCard) currentAccount).getAddedInterest();
-            }
-            Period period = Period.between(toCompare, LocalDate.now());
+            Period period = Period.between(((CreditCard) currentAccount).getAddedInterest(), LocalDate.now());
             int years = Math.abs(period.getYears());
             int months = Math.abs(period.getMonths());
             int days = Math.abs(period.getDays());
@@ -260,13 +248,7 @@ public class AccountService {
             }
         }
         if(currentAccount instanceof Checking){
-            LocalDate toCompare = null;
-            if(((Checking) currentAccount).getMaintenanceCharged() == null){
-                toCompare = currentAccount.getCreationDate();
-            } else {
-                toCompare = ((Checking) currentAccount).getMaintenanceCharged();
-            }
-            Period period = Period.between(toCompare, LocalDate.now());
+            Period period = Period.between(((Checking) currentAccount).getMaintenanceCharged(), LocalDate.now());
             int years = Math.abs(period.getYears());
             int months = Math.abs(period.getMonths());
             int days = Math.abs(period.getDays());

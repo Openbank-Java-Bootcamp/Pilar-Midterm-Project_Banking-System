@@ -30,7 +30,7 @@ public class Savings extends Account{
     @Column(precision=5,scale=4)
     private BigDecimal interestRate;
 
-    private LocalDate addedInterest = null;
+    private LocalDate addedInterest;
 
     public Savings() {
     }
@@ -40,6 +40,7 @@ public class Savings extends Account{
         this.secretKey = secretKey;
         setMinimumBalance(minimumBalance);
         setInterestRate(interestRate);
+        this.addedInterest = LocalDate.now();
     }
 
     public String getSecretKey() {

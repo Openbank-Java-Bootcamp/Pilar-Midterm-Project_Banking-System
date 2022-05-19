@@ -1,17 +1,18 @@
 package com.ironhack.midtermproject.DTO;
 
 import com.ironhack.midtermproject.model.Money;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public class CheckingAccountDTO {
-    @NotNull
+    @NotBlank(message = "Transfer amount may not be blank")
     private Money balance;
-    @NotNull
+    @NotBlank(message = "Name of the owner of the account may not be blank")
     private Long primaryAccountOwnerId;
     private Long secondaryAccountOwnerId;
-    @NotNull
+    @NotBlank(message = "Secret Key may not be blank")
     private String secretKey;
 
     public CheckingAccountDTO(Money balance, Long primaryAccountOwnerId, Long secondaryAccountOwnerId, String secretKey) {

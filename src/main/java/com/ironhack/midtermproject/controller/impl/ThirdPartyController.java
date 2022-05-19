@@ -6,6 +6,7 @@ import com.ironhack.midtermproject.controller.interfaces.IThirdPartyController;
 import com.ironhack.midtermproject.model.AccountHolder;
 import com.ironhack.midtermproject.model.ThirdParty;
 import com.ironhack.midtermproject.service.impl.ThirdPartyService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,19 +20,19 @@ public class ThirdPartyController implements IThirdPartyController {
 
     @PostMapping("/thirdparties")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createAThirdParty(@RequestBody ThirdParty thirdParty){
+    public void createAThirdParty(@RequestBody @Valid ThirdParty thirdParty){
         thirdPartyService.saveThirdParty(thirdParty);
     }
 
     @PatchMapping("/thirdtransfer")
     @ResponseStatus(HttpStatus.OK)
-    public void transferMoneyThirdParty(@RequestParam String hashedKey, @RequestBody ThirdPartyTransferDTO thirdPartyTransferDTO){
+    public void transferMoneyThirdParty(@RequestParam String hashedKey, @RequestBody @Valid  ThirdPartyTransferDTO thirdPartyTransferDTO){
         thirdPartyService.transferMoneyThirdParty(hashedKey, thirdPartyTransferDTO);
     }
 
     @PatchMapping("/thirdtake")
     @ResponseStatus(HttpStatus.OK)
-    public void takeMoneyThirdParty(@RequestParam String hashedKey, @RequestBody ThirdPartyTransferDTO thirdPartyTransferDTO){
+    public void takeMoneyThirdParty(@RequestParam String hashedKey, @RequestBody @Valid  ThirdPartyTransferDTO thirdPartyTransferDTO){
         thirdPartyService.takeMoneyThirdParty(hashedKey, thirdPartyTransferDTO);
     }
 

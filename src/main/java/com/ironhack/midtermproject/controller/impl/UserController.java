@@ -7,6 +7,7 @@ import com.ironhack.midtermproject.model.Admin;
 import com.ironhack.midtermproject.model.Checking;
 import com.ironhack.midtermproject.model.User;
 import com.ironhack.midtermproject.service.impl.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,13 @@ public class UserController implements IUserController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createAccountHolder(@RequestBody AccountHolder accountHolder){
+    public void createAccountHolder(@RequestBody @Valid AccountHolder accountHolder){
         userService.createAccountHolder(accountHolder);
     }
 
     @PostMapping("/users/admin")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createAdmin(@RequestBody Admin admin){
+    public void createAdmin(@RequestBody @Valid Admin admin){
         userService.createAdmin(admin);
     }
 
