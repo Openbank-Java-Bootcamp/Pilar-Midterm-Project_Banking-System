@@ -7,10 +7,7 @@ import com.ironhack.midtermproject.model.Role;
 import com.ironhack.midtermproject.service.impl.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -21,14 +18,14 @@ public class RoleController implements IRoleController {
 
     @PostMapping("/roles")
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveRole(Role role){
+    public void saveRole(@RequestBody Role role){
         roleService.saveRole(role);
     }
 
 
     @PostMapping("/roletouser")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addRoleToUser(RoleToUserDTO roleToUserDto){
+    public void addRoleToUser(@RequestBody RoleToUserDTO roleToUserDto){
         roleService.addRoleToUser(roleToUserDto.getUsername(),roleToUserDto.getRoleName());
     }
 }

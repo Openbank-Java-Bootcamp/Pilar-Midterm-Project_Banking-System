@@ -26,7 +26,7 @@ public class UserController implements IUserController {
 
     @PostMapping("/users/admin")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createAdmin(Admin admin){
+    public void createAdmin(@RequestBody Admin admin){
         userService.createAdmin(admin);
     }
 

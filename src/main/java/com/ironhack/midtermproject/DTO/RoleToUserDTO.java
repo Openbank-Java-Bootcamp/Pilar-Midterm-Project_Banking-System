@@ -10,4 +10,9 @@ public class RoleToUserDTO {
     private String username;
     @NotNull
     private String roleName;
+
+    public RoleToUserDTO(String username, String roleName) {
+        this.username = username;
+        this.roleName = roleName;
+    }
 }

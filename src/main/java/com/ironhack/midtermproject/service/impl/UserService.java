@@ -38,11 +38,7 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Autowired
     private RoleRepository roleRepository;
-    public User saveUser(User user){ //create the user, save the password and return it
-        log.info("Saving a new user {} inside of the database", user.getName());  //inside {} the name of the user is shown
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
+
 
     public List<User> getUsers(){
         log.info("Fetching all users");
@@ -50,11 +46,14 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     public AccountHolder createAccountHolder(AccountHolder accountHolder){
-
+        log.info("Saving a new user {} inside of the database", accountHolder.getName());  //inside {} the name of the user is shown
+        accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));
         return userRepository.save(accountHolder);
     }
 
     public Admin createAdmin(Admin admin){
+        log.info("Saving a new user {} inside of the database", admin.getName());  //inside {} the name of the user is shown
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         return userRepository.save(admin);
     }
 

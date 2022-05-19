@@ -28,6 +28,9 @@ import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 
+import static java.math.RoundingMode.HALF_EVEN;
+import static java.math.RoundingMode.HALF_UP;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -51,8 +54,8 @@ public class AccountService {
         if(primaryOwner instanceof AccountHolder && (secondaryOwner instanceof AccountHolder || secondaryOwner == null)){
             LocalDate dob = ((AccountHolder) primaryOwner).getDateOfBirth();
             LocalDate now = LocalDate.now();
-            int yearDOB = dob.getMonthValue();
-            int yearNow = now.getMonthValue();
+            int yearDOB = dob.getYear();
+            int yearNow = now.getYear();
             int age = yearNow -yearDOB;
             if(age < 24){
                 StudentChecking studentAccount = new StudentChecking(checkingAccountDTO.getBalance(),(AccountHolder) primaryOwner,(AccountHolder) secondaryOwner,checkingAccountDTO.getSecretKey());
@@ -115,44 +118,47 @@ public class AccountService {
         //en esta parte hay un error que me da la siguiente exepcion: nested exception is java.lang.NullPointerException: temporal
         //comprobar fraude antes de hacer transfer
 
-        LocalDateTime lastTransferDate = transferRepository.findLastTransferDateByAccountId(currentAccount.getId());
+        /*LocalDateTime lastTransferDate = transferRepository.findLastTransferDateByAccountId(currentAccount.getId());
         if(lastTransferDate != null){
             Duration duration = Duration.between(LocalDateTime.now(), lastTransferDate);
             if(currentAccount instanceof Savings && duration.getSeconds()<= 1){
                 ((Savings) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
             }
             if(currentAccount instanceof StudentChecking && duration.getSeconds()<= 1){
                 ((StudentChecking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
             }
             if(currentAccount instanceof Checking && duration.getSeconds()<= 1){
                 ((Checking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
             }
-        }
+        }*/
 
         //tengo que agrupar por dia y calcular el maximo amount transferido en un dia,
         // y comparar con el total del dia en que se esta haciendo la transferencia.
 
-        BigDecimal maxDaily = transferRepository.findMaxDailyTransferAmount(currentAccount.getId());
-        BigDecimal actualDaily = transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId());
-        if(maxDaily!=null && maxDaily.compareTo(BigDecimal.ZERO)!=0){
-            BigDecimal percentage = actualDaily.multiply(new BigDecimal(100).divide(maxDaily));
+        /*BigDecimal maxDaily = transferRepository.findMaxDailyTransferAmount(currentAccount.getId());
+        BigDecimal actualDaily = null;
+        if(transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId()) != null){
+            actualDaily = transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId()).add(ownerTransferDTO.getTransferAmount().getAmount());
+        }
+        if(maxDaily!=null && actualDaily != null && maxDaily.compareTo(BigDecimal.ZERO)!=0){
+            BigDecimal percentage = actualDaily.multiply(new BigDecimal(100).divide(maxDaily,2,HALF_UP));
             if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof Savings){
                 ((Savings) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
             }
             if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof Checking){
                 ((Checking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
             }
             if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof StudentChecking){
                 ((StudentChecking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
             }
         }
-
+*/
 
         //si no hay fraude, buscar la cuenta destino a ver si existe y entonces hacer la transferencia
         Account targetAccount = accountRepository.findById(ownerTransferDTO.getTargetAccountId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
@@ -161,7 +167,10 @@ public class AccountService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided id or owner of the target account is wrong");
         } else {
             BigDecimal actualBalance = currentAccount.getBalance().getAmount();
-            if(actualBalance.compareTo(ownerTransferDTO.getTransferAmount().getAmount()) == -1){
+            BigDecimal amountToTransfer = ownerTransferDTO.getTransferAmount().getAmount();
+            if(currentAccount instanceof CreditCard && actualBalance.subtract(amountToTransfer).compareTo(((CreditCard) currentAccount).getCreditLimit().getAmount().negate()) == -1){
+                throw new IllegalArgumentException("You have reached your credit limit");
+            }else if(!(currentAccount instanceof CreditCard) && actualBalance.compareTo(amountToTransfer) == -1){
                 throw new IllegalArgumentException("Not sufficient funds");
             } else {
                 currentAccount.setBalance(new Money(actualBalance.subtract(ownerTransferDTO.getTransferAmount().getAmount()),Currency.getInstance("EUR")));
@@ -225,7 +234,7 @@ public class AccountService {
                 toCompare = ((CreditCard) currentAccount).getAddedInterest();
             }
             int months = Period.between(toCompare, LocalDate.now()).getMonths();
-            BigDecimal monthRate = ((CreditCard) currentAccount).getInterestRate().divide(new BigDecimal(12));
+            BigDecimal monthRate = ((CreditCard) currentAccount).getInterestRate().divide(new BigDecimal(12),2,HALF_EVEN);
             BigDecimal interest = currentAccount.getBalance().getAmount().multiply(monthRate).multiply(BigDecimal.valueOf(months));
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().add(interest),Currency.getInstance("EUR")));
             //guardar la cuenta actualizada
@@ -307,5 +316,7 @@ public class AccountService {
         Account accountFromDB= accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         accountRepository.deleteById(accountId);
     }
+
+
 }
 

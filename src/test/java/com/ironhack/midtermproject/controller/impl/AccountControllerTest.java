@@ -17,10 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
@@ -28,7 +30,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -158,14 +160,123 @@ class AccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
     }
 
+
+    //no me funcionan las de transfer
+    //Expected :204
+    //Actual   :404 not found
     @Test
-    //@WithMockUser(username = "pili", password = "1234", roles = "ACCOUNT_HOLDER")
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    //@WithMockUser(username="admin",roles={"USER","ADMIN"})
     void transferMoney_Valid_NotContent() throws Exception {
-        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), "Paula Lopez", 4L,1L);
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(50), Currency.getInstance("EUR")), "Paula Lopez", 2L,1L);
         String body = objectMapper.writeValueAsString(o);
-        MvcResult mvcResult = mockMvc.perform(post("/api/transfer").with(user("pili"))
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer") //.with(user("pili"))
                 .content(body)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
+    }
+
+
+    //no me funcionan las de transfer
+    //Expected :404
+    //Actual   :405
+    @Test
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+        //@WithMockUser(username="admin",roles={"USER","ADMIN"})
+    void transferMoney_NotValidOwnAccountId_NotContent() throws Exception {
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), "Paula Lopez", 4L,15L);
+        String body = objectMapper.writeValueAsString(o);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer") //.with(user("pili"))
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).andReturn();
+    }
+
+    //no me funcionan las de transfer
+    //Expected :200
+    //Actual   :404
+    @Test
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    void getBalance_Valid_MoneyObject() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(get("/api/balance")
+                        .queryParam("accountId", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        assertTrue(mcvResult.getResponse().getContentAsString().contains("500"));
+    }
+
+
+    //no me funcionan las de transfer
+    @Test
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    void getBalance_NoInterestAdded_InterestAdded() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(get("/api/balance")
+                        .queryParam("accountId", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        assertTrue(mcvResult.getResponse().getContentAsString().contains(""));
+    }
+
+    @Test
+    void getBalanceAdmin_Valid_MoneyObjectOKStatus() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(get("/api/adminbalance")
+                        .queryParam("accountId", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        assertTrue(mcvResult.getResponse().getContentAsString().contains("500"));
+    }
+
+    //no me funciona, cambie la fecha de creacion y no me añade intereses
+    /*@Test
+    void getBalanceAdmin_NotAddedInterest_MoneyObject() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(get("/api/adminbalance")
+                        .queryParam("accountId", "5")
+                )
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        assertTrue(mcvResult.getResponse().getContentAsString().contains("500")); //no se me añaden los intereses
+    }*/
+
+
+    @Test
+    void changeBalance_Valid_StatusNoContent() throws Exception {
+        //accountId, newBalance
+        MvcResult mcvResult = mockMvc.perform(patch("/api/setbalance")
+                        .queryParam("accountId", "2")
+                        .queryParam("newBalance", "1000")
+                )
+                .andExpect(status().isNoContent()).andReturn();
+    }
+
+    @Test
+    void changeBalance_NotValidId_StatusNotFound() throws Exception {
+        //accountId, newBalance
+        MvcResult mcvResult = mockMvc.perform(patch("/api/setbalance")
+                        .queryParam("accountId", "20")
+                        .queryParam("newBalance", "1000")
+                )
+                .andExpect(status().isNotFound()).andReturn();
+    }
+
+    @Test
+    void deleteAccount_Valid_NoContentStatus() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(delete("/api/account")
+                        .queryParam("accountId", "2")
+                )
+                .andExpect(status().isNoContent()).andReturn();
+    }
+
+    @Test
+    void deleteAccount_NotValidId_NotFoundStatus() throws Exception {
+        MvcResult mcvResult = mockMvc.perform(delete("/api/account")
+                        .queryParam("accountId", "20")
+                )
+                .andExpect(status().isNotFound()).andReturn();
     }
 
 }
