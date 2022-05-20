@@ -19,6 +19,8 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     @Query(value = "SELECT SUM(amount) FROM transfer WHERE date BETWEEN :date - INTERVAL 1 DAY AND :date AND from_account_id = :id", nativeQuery = true)
     BigDecimal findAmountTransferedLastDayFromNow(@Param("date") LocalDateTime date, @Param("id") Long accountId);
 
+    @Query("SELECT COUNT(*) FROM Transfer WHERE fromAccountId = :id")
+    Integer findCountOfTransactionsByAccountId(@Param("id") Long accountId);
 
 
 

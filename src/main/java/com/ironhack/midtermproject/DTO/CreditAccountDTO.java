@@ -8,9 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class CreditAccountDTO {
-    @NotBlank(message = "Transfer amount may not be blank")
+    @NotNull
     private Money balance;
-    @NotBlank(message = "Name of the owner of the account may not be blank")
+    @NotNull
     private Long primaryAccountOwnerId;
     private Long secondaryAccountOwnerId;
     private Money creditLimit;

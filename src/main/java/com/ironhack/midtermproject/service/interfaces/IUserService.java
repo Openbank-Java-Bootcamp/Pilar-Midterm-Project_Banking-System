@@ -6,4 +6,5 @@ import com.ironhack.midtermproject.model.Admin;
 public interface IUserService {
     AccountHolder createAccountHolder(AccountHolder accountHolder);
     Admin createAdmin(Admin admin);
+    void deleteUser(Long userId);
 }

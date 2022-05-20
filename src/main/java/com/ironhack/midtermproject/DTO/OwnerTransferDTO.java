@@ -7,13 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class OwnerTransferDTO {
-    @NotBlank(message = "Transfer amount may not be blank")
+    @NotNull
     private Money transferAmount;
-    @NotBlank(message = "Name of the owner of the destination account may not be blank")
+    @NotNull
     private String ownerTargetName;
-    @NotBlank(message = "Id of the destination account may not be blank")
+    @NotNull
     private Long targetAccountId;
-    @NotBlank(message = "Your account id may not be blank")
+    @NotNull
     private Long ownAccountId;
 
     public OwnerTransferDTO(Money transferAmount, String ownerTargetName, Long targetAccountId, Long ownAccountId) {

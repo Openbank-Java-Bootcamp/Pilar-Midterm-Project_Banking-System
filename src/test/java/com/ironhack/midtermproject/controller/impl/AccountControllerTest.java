@@ -28,8 +28,14 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -67,7 +73,22 @@ class AccountControllerTest {
 
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
+  /*  DateTimeFormatter df = new DateTimeFormatterBuilder()
+            // case insensitive to parse JAN and FEB
+            //.parseCaseInsensitive()
+            // add pattern
+            .appendPattern("yyyy-MM-dd")
+            // create formatter (use English Locale to parse month names)
+            .toFormatter(Locale.ENGLISH);*/
+
+    private DateTimeFormatter df =
+            new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd[ [HH][:mm][:ss][.SSS]]")
+                    .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                    .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                    .toFormatter();
 
     @BeforeEach
     void setUp(){
@@ -86,16 +107,26 @@ class AccountControllerTest {
         Role role1 = new Role("ROLE_ACCOUNT_HOLDER");
         Role role2 = new Role("ROLE_ADMIN");
 
-        Account acc1 = new Savings(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user1, (AccountHolder) user2,"1234",new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")),BigDecimal.valueOf(0.4));
-        Account acc2 = new CreditCard(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user2,null,new Money(BigDecimal.valueOf(10000), Currency.getInstance("EUR")),BigDecimal.valueOf(0.15));
-        Account acc3 = new Checking(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user1,null,"1234");
-        Account acc4 = new StudentChecking(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user3, (AccountHolder) user2,"1234");
-        Account acc5 = new Savings(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user2, (AccountHolder) user1,"1234",new Money(BigDecimal.valueOf(800), Currency.getInstance("EUR")),BigDecimal.valueOf(0.2));
-        Account acc6 = new CreditCard(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user3,null,new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")),BigDecimal.valueOf(0.2));
+        Savings acc1 = new Savings(new Money(BigDecimal.valueOf(50000), Currency.getInstance("EUR")), (AccountHolder) user1, (AccountHolder) user2,"1234",new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")),BigDecimal.valueOf(0.4));
+        CreditCard acc2 = new CreditCard(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user2,null,new Money(BigDecimal.valueOf(10000), Currency.getInstance("EUR")),BigDecimal.valueOf(0.15));
+        Checking acc3 = new Checking(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user1,null,"1234");
+        StudentChecking acc4 = new StudentChecking(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user3, (AccountHolder) user2,"1234");
+        Savings acc5 = new Savings(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user2, (AccountHolder) user1,"1234",new Money(BigDecimal.valueOf(800), Currency.getInstance("EUR")),BigDecimal.valueOf(0.2));
+        CreditCard acc6 = new CreditCard(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), (AccountHolder) user3,null,new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")),BigDecimal.valueOf(0.2));
 
-        acc4.setCreationDate(LocalDate.parse("2022-03-02"));
-        acc5.setCreationDate(LocalDate.parse("2021-04-15"));
-        acc6.setCreationDate(LocalDate.parse("2022-03-02"));
+        acc1.setCreationDate(LocalDate.parse("2022-02-01"));
+        acc3.setMaintenanceCharged(LocalDate.parse("2022-03-02"));
+        acc5.setAddedInterest(LocalDate.parse("2021-04-15"));
+        acc6.setAddedInterest(LocalDate.parse("2022-03-02"));
+
+        Transfer tf1 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-02",df));
+        Transfer tf2 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-03",df));
+        Transfer tf3 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-04",df));
+        Transfer tf4 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-05",df));
+        Transfer tf5 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-06",df));
+        Transfer tf6 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-07",df));
+        Transfer tf7 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-08",df));
+
 
         user1.getRoles().add(role1);
         user2.getRoles().add(role1);
@@ -106,6 +137,7 @@ class AccountControllerTest {
         userRepository.saveAll(List.of(user1, user2, user3, user4));
         thirdPartyRepository.save(tp1);
         accountRepository.saveAll(List.of(acc1, acc2, acc3, acc4, acc5, acc6));
+        transferRepository.saveAll(List.of(tf1, tf2, tf3, tf4, tf5, tf6,tf7));
     }
 
     @AfterEach
@@ -181,6 +213,19 @@ class AccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
     }
 
+    @Test
+    @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
+    void transferMoney_Fraud_NotContent() throws Exception {
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(1000), Currency.getInstance("EUR")), "Macarena Garcia", 2L,1L);
+        String body = objectMapper.writeValueAsString(o);
+        MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
+                .content(body)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
+        Account acc = accountRepository.findById(o.getOwnAccountId()).get();
+        assertEquals("FROZEN",((Savings) acc).getStatus().toString());
+        //assertTrue(((Savings) acc).getStatus().toString().contains("FROZEN"));
+    }
+
 
     @Test
     @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
@@ -236,7 +281,6 @@ class AccountControllerTest {
     }
 
 
-    //no esta funcionando lo de los intereses
     @Test
     @WithMockUser(username = "pauli", password = "1234", roles = {"ACCOUNT_HOLDER"})
     void getBalance_NoInterestAdded_InterestAdded() throws Exception {
