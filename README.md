@@ -18,6 +18,8 @@ Java, SpringBoot, MySQL, Postman.
 
 ## Models
 
+![diagram-13559756363580999122](https://user-images.githubusercontent.com/104001417/169570867-16651834-6dc8-42c0-a810-be2a62c9c386.png)
+
 
 ## Server Routes Table
 ## Future Work
