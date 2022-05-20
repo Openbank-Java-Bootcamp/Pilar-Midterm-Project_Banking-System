@@ -22,27 +22,27 @@ Java, SpringBoot, MySQL, Postman.
 
 
 ## Server Routes Table
-
-| Request Type  | Route              | Description  | Authorization    |
-| ------------- | ---------------    | ------------ |----------------- |
-| `POST`        | /api/login         | NewYork      | PUBLIC           |
-| `POST`        | /api/checking      | NewYork      | ADMIN            |
-| `POST`        | /api/saving        | NewYork      | ADMIN            |
-| `POST`        | /api/credit        | NewYork      | ADMIN            |
-| `PATCH`       | /api/transfer      | NewYork      | ACCOUNT HOLDER           |
-| `GET`         | /api/balance       | NewYork      | ACCOUNT HOLDER           |
-| `GET`         | /api/adminbalance  | NewYork      | ADMIN            |
-| `PATCH`       | /api/setbalance    | NewYork      | ADMIN            |
-| `DELETE`      | /api/account       | Toronto      | ADMIN          |
-| `POST`        | /api/roles         | Toronto      | ADMIN   |
-| `POST`        | /api/roletouser    | Toronto      | ADMIN   |
-| `POST`        | /api/thirdparties  | Toronto      | ADMIN   |
-| `PATCH`       | /api/thirdtransfer | Toronto      | PUBLIC   |
-| `PATCH`       | /api/thirdtake     | Toronto      | PUBLIC   |
-| `DELETE`      | /api/thirdparties  | Toronto      | ADMIN         |
-| `POST`        | /api/users         | NewYork      | PUBLIC         |
-| `POST`        | /api/admin         | NewYork      | ADMIN         |
-| `DELETE`      | /api/users         | Toronto      | ADMIN          |
+ 
+| Request Type  | Route              | Description                            | Authorization    |
+| ------------- | ---------------    | -------------------------------------- |----------------- |
+| `POST`        | /api/login         | Login  with username and password      | PUBLIC           |
+| `POST`        | /api/checking      | Create a Checking Account              | ADMIN            |
+| `POST`        | /api/saving        | Create a Saving Account                | ADMIN            |
+| `POST`        | /api/credit        | Create a Credit Account                | ADMIN            |
+| `PATCH`       | /api/transfer      | Transfer Money                         | ACCOUNT HOLDER           |
+| `GET`         | /api/balance       | Access account balance                 | ACCOUNT HOLDER           |
+| `GET`         | /api/adminbalance  | Access any account balance             | ADMIN            |
+| `PATCH`       | /api/setbalance    | Modify any account balance             | ADMIN            |
+| `DELETE`      | /api/account       | Delete an account                      | ADMIN          |
+| `POST`        | /api/roles         | Create a new authority role            | ADMIN   |
+| `POST`        | /api/roletouser    | Add role to a user                     | ADMIN   |
+| `POST`        | /api/thirdparties  | Create a Third Party                   | ADMIN   |
+| `PATCH`       | /api/thirdtransfer | A third party transfer money to an account      | PUBLIC   |
+| `PATCH`       | /api/thirdtake     | A third party takes money from an account      | PUBLIC   |
+| `DELETE`      | /api/thirdparties  | Delete a Third Party                   | ADMIN         |
+| `POST`        | /api/users         | Create an Account Holder               | PUBLIC         |
+| `POST`        | /api/admin         | Create an Admin                        | ADMIN         |
+| `DELETE`      | /api/users         | Delete a user                          | ADMIN          |
 
 ## Future Work
 ## Resources
