@@ -5,6 +5,7 @@ import com.ironhack.midtermproject.model.Role;
 import com.ironhack.midtermproject.model.User;
 import com.ironhack.midtermproject.repository.RoleRepository;
 import com.ironhack.midtermproject.repository.UserRepository;
+import com.ironhack.midtermproject.service.interfaces.IRoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RoleService {
+public class RoleService implements IRoleService {
 
     @Autowired
     private RoleRepository roleRepository;

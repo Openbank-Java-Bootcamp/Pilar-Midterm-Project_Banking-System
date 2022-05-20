@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.model;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,9 +11,9 @@ import java.util.Currency;
 @Embeddable
 @Data
 public class Money {
-    @NotBlank(message = "Amount may not be blank")
+    @NotNull
     private BigDecimal amount;
-    @NotBlank(message = "Currency may not be blank")
+    @NotNull
     private Currency currency;
 
     public Money() {

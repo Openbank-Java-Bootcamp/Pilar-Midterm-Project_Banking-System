@@ -10,6 +10,7 @@ import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
 import com.ironhack.midtermproject.repository.TransferRepository;
 import com.ironhack.midtermproject.repository.UserRepository;
+import com.ironhack.midtermproject.service.interfaces.IAccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ import static java.math.RoundingMode.HALF_UP;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AccountService {
+public class AccountService implements IAccountService {
 
     @Autowired
     AccountRepository accountRepository;
@@ -45,6 +46,9 @@ public class AccountService {
 
     @Autowired
     TransferRepository transferRepository;
+
+    @Autowired
+    TransferService transferService;
 
     public Account createCheckingAccount(CheckingAccountDTO checkingAccountDTO){
         User primaryOwner =userRepository.findById(checkingAccountDTO.getPrimaryAccountOwnerId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary Owner id not found"));
@@ -115,82 +119,39 @@ public class AccountService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This is not your account");
         }
 
-
-        //en esta parte hay un error que me da la siguiente exepcion: nested exception is java.lang.NullPointerException: temporal
-        //comprobar fraude antes de hacer transfer
-
-        /*LocalDateTime lastTransferDate = transferRepository.findLastTransferDateByAccountId(currentAccount.getId());
-        if(lastTransferDate != null){
-            Duration duration = Duration.between(LocalDateTime.now(), lastTransferDate);
-            if(currentAccount instanceof Savings && duration.getSeconds()<= 1){
-                ((Savings) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
-            }
-            if(currentAccount instanceof StudentChecking && duration.getSeconds()<= 1){
-                ((StudentChecking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
-            }
-            if(currentAccount instanceof Checking && duration.getSeconds()<= 1){
-                ((Checking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
-            }
+        //no funca
+        /*if(!(currentAccount instanceof CreditCard)) {
+            transferService.fraudDetectionOne(currentAccount, ownerTransferDTO.getTransferAmount().getAmount());
         }*/
 
-        //tengo que agrupar por dia y calcular el maximo amount transferido en un dia,
-        // y comparar con el total del dia en que se esta haciendo la transferencia.
-
-        /*BigDecimal maxDaily = transferRepository.findMaxDailyTransferAmount(currentAccount.getId());
-        BigDecimal actualDaily = null;
-        if(transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId()) != null){
-            actualDaily = transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId()).add(ownerTransferDTO.getTransferAmount().getAmount());
-        }
-        if(maxDaily!=null && actualDaily != null && maxDaily.compareTo(BigDecimal.ZERO)!=0){
-            BigDecimal percentage = actualDaily.multiply(new BigDecimal(100).divide(maxDaily,2,HALF_UP));
-            if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof Savings){
-                ((Savings) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
-            }
-            if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof Checking){
-                ((Checking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
-            }
-            if(percentage.compareTo(new BigDecimal(150))==1 && currentAccount instanceof StudentChecking){
-                ((StudentChecking) currentAccount).setStatus(Status.FROZEN);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"In order to prevent fraud your Account has been frozen and the transfer haven't been processed");
-            }
-        }
-*/
-
         //si no hay fraude, buscar la cuenta destino a ver si existe y entonces hacer la transferencia
-        Account targetAccount = accountRepository.findById(ownerTransferDTO.getTargetAccountId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
+        Account targetAccount = accountRepository.findById(ownerTransferDTO.getTargetAccountId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
 
-        if(!targetAccount.getPrimaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()) && (targetAccount.getSecondaryOwner() == null || !targetAccount.getSecondaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()))){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The provided id or owner of the target account is wrong");
+        if (!targetAccount.getPrimaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()) && (targetAccount.getSecondaryOwner() == null || !targetAccount.getSecondaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The provided id or owner of the target account is wrong");
         } else {
             BigDecimal actualBalance = currentAccount.getBalance().getAmount();
             BigDecimal amountToTransfer = ownerTransferDTO.getTransferAmount().getAmount();
-            if(currentAccount instanceof CreditCard && actualBalance.subtract(amountToTransfer).compareTo(((CreditCard) currentAccount).getCreditLimit().getAmount().negate()) == -1){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You have reached your credit limit");
-            }else if(!(currentAccount instanceof CreditCard) && actualBalance.compareTo(amountToTransfer) == -1){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You have reached your credit limit");
+            if (currentAccount instanceof CreditCard && actualBalance.subtract(amountToTransfer).compareTo(((CreditCard) currentAccount).getCreditLimit().getAmount().negate()) == -1) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have reached your credit limit");
+            } else if (!(currentAccount instanceof CreditCard) && actualBalance.compareTo(amountToTransfer) == -1) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have reached your credit limit");
             } else {
-                currentAccount.setBalance(new Money(actualBalance.subtract(ownerTransferDTO.getTransferAmount().getAmount()),Currency.getInstance("EUR")));
-                targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().add(ownerTransferDTO.getTransferAmount().getAmount()),Currency.getInstance("EUR")));
+                currentAccount.setBalance(new Money(actualBalance.subtract(ownerTransferDTO.getTransferAmount().getAmount()), Currency.getInstance("EUR")));
+                targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().add(ownerTransferDTO.getTransferAmount().getAmount()), Currency.getInstance("EUR")));
             }
         }
 
         //tambien necesito saber el tipo de la cuenta de origen para ver si baja del minimumbalance
-        if(currentAccount instanceof Savings && currentAccount.getBalance().getAmount().compareTo(((Savings) currentAccount).getMinimumBalance().getAmount()) == -1){
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()),currentAccount.getBalance().getCurrency()));
-        } else if(currentAccount instanceof Checking && currentAccount.getBalance().getAmount().compareTo(((Checking) currentAccount).getMinimumBalance().getAmount()) == -1){
-            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()),currentAccount.getBalance().getCurrency()));
+        if (currentAccount instanceof Savings && currentAccount.getBalance().getAmount().compareTo(((Savings) currentAccount).getMinimumBalance().getAmount()) == -1) {
+            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()), currentAccount.getBalance().getCurrency()));
+        } else if (currentAccount instanceof Checking && currentAccount.getBalance().getAmount().compareTo(((Checking) currentAccount).getMinimumBalance().getAmount()) == -1) {
+            currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()), currentAccount.getBalance().getCurrency()));
         }
 
-
         //cada vez que se hace una transferencia agregarla a la tabla transfer
-        Transfer transfer = new Transfer(currentAccount.getId(),ownerTransferDTO.getTransferAmount().getAmount(), LocalDateTime.now());
+        Transfer transfer = new Transfer(currentAccount.getId(), ownerTransferDTO.getTransferAmount().getAmount(), LocalDateTime.now());
         transferRepository.save(transfer);
-
 
         //me falta guardar las cuentas actualizadas tambien
         accountRepository.save(currentAccount);
@@ -217,6 +178,7 @@ public class AccountService {
 
         return currentAccount.getBalance();
     }
+
 
     public void checkInterestAndMaintenance(Account currentAccount){
         if(currentAccount instanceof Savings) {

@@ -4,6 +4,8 @@ import com.ironhack.midtermproject.DTO.ThirdPartyTransferDTO;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.repository.AccountRepository;
 import com.ironhack.midtermproject.repository.ThirdPartyRepository;
+import com.ironhack.midtermproject.service.interfaces.IAccountService;
+import com.ironhack.midtermproject.service.interfaces.IThirdPartyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ThirdPartyService {
+public class ThirdPartyService implements IThirdPartyService {
 
     @Autowired
     private ThirdPartyRepository thirdPartyRepository;
