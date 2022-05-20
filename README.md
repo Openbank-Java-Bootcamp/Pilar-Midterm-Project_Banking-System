@@ -23,12 +23,12 @@ Java, SpringBoot, MySQL, Postman.
 
 ## Server Routes Table
 
-| Request Type  | Route         | Description  |
-| ------------- | ------------- | ------------ |
-| GET           | Test1         | NewYork      |
-| POST          | Test2         | Toronto      |
-| PATCH         | Test1         | NewYork      |
-| DELETE        | Test2         | Toronto      |
+| Request Type  | Route         | Description  | Authorization    |
+| ------------- | ------------- | ------------ |----------------- |
+| `GET`           | /api/balance  | NewYork      | ADMIN            |
+| `POST`          | Test2         | Toronto      | ACCOUNT HOLDER   |
+| `PATCH`         | Test1         | NewYork      | NewYork          |
+| `DELETE`        | Test2         | Toronto      | Toronto          |
 
 ## Future Work
 ## Resources
