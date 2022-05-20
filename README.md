@@ -22,5 +22,11 @@ Java, SpringBoot, MySQL, Postman.
 
 
 ## Server Routes Table
+
+| Request Type  | LastName      | City     |
+| ------------- | ------------- | -------- |
+| John          | Test1         | NewYork  |
+| Bob           | Test2         | Toronto  |
+
 ## Future Work
 ## Resources
