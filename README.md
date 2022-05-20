@@ -23,12 +23,26 @@ Java, SpringBoot, MySQL, Postman.
 
 ## Server Routes Table
 
-| Request Type  | Route         | Description  | Authorization    |
-| ------------- | ------------- | ------------ |----------------- |
-| `GET`           | /api/balance  | NewYork      | ADMIN            |
-| `POST`          | Test2         | Toronto      | ACCOUNT HOLDER   |
-| `PATCH`         | Test1         | NewYork      | NewYork          |
-| `DELETE`        | Test2         | Toronto      | Toronto          |
+| Request Type  | Route              | Description  | Authorization    |
+| ------------- | ---------------    | ------------ |----------------- |
+| `POST`        | /api/login         | NewYork      | PUBLIC           |
+| `POST`        | /api/checking      | NewYork      | ADMIN            |
+| `POST`        | /api/saving        | NewYork      | ADMIN            |
+| `POST`        | /api/credit        | NewYork      | ADMIN            |
+| `PATCH`       | /api/transfer      | NewYork      | ACCOUNT HOLDER           |
+| `GET`         | /api/balance       | NewYork      | ACCOUNT HOLDER           |
+| `GET`         | /api/adminbalance  | NewYork      | ADMIN            |
+| `PATCH`       | /api/setbalance    | NewYork      | ADMIN            |
+| `DELETE`      | /api/account       | Toronto      | ADMIN          |
+| `POST`        | /api/roles         | Toronto      | ADMIN   |
+| `POST`        | /api/roletouser    | Toronto      | ADMIN   |
+| `POST`        | /api/thirdparties  | Toronto      | ADMIN   |
+| `PATCH`       | /api/thirdtransfer | Toronto      | PUBLIC   |
+| `PATCH`       | /api/thirdtake     | Toronto      | PUBLIC   |
+| `DELETE`      | /api/thirdparties  | Toronto      | ADMIN         |
+| `POST`        | /api/users         | NewYork      | PUBLIC         |
+| `POST`        | /api/admin         | NewYork      | ADMIN         |
+| `DELETE`      | /api/users         | Toronto      | ADMIN          |
 
 ## Future Work
 ## Resources
