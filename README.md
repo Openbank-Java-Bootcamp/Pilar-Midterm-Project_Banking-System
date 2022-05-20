@@ -15,8 +15,6 @@ $ git clone https://github.com/Openbank-Java-Bootcamp/Pilar-Midterm-Project_Bank
 
 Java, SpringBoot, MySQL, Postman.
 
-**negritaaa** 
-
 
 ## Models
 
