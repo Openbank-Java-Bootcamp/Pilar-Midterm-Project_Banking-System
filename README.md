@@ -197,5 +197,8 @@ Admin
 }
 ```
 
-## Future Work
 ## Resources
+
+Instructors of Ironhack: Raymond & Shaun.
+https://www.baeldung.com/
+https://stackoverflow.com/
