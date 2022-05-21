@@ -51,5 +51,21 @@ Every time an account holder access their balance, it is checked if it is necess
 | `POST`        | /api/admin         | Create an Admin                        | ADMIN         |Admin object|
 | `DELETE`      | /api/users         | Delete a user                          | ADMIN          |userId|
 
+Objects must be provided in the body of the request as raw and JSON format.
+
+CheckingAccountDTO
+
+```bash
+{
+    "balance": {
+        "amount": "500",
+        "currency": "EUR"
+    } ,
+    "primaryAccountOwnerId": "5" ,
+    "secondaryAccountOwnerId": "",
+    "secretKey": "5688"
+}
+```
+
 ## Future Work
 ## Resources
