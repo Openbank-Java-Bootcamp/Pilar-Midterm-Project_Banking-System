@@ -67,5 +67,64 @@ CheckingAccountDTO
 }
 ```
 
+SavingAccountDTO
+
+```bash
+{
+    "balance": {
+        "amount": "500",
+        "currency": "EUR"
+    } ,
+    "primaryAccountOwnerId": "1" ,
+    "secondaryAccountOwnerId": "",
+    "secretKey": "5689",
+    "minimumBalance":{
+        "amount":"1500",
+        "currency": "EUR"
+    },
+    "interestRate": "0.6"
+}
+```
+
+CreditAccountDTO
+
+```bash
+{
+    "balance": {
+        "amount": "1000",
+        "currency": "EUR"
+    },
+    "primaryAccountOwnerId": "5" ,
+    "secondaryAccountOwnerId": null,
+    "creditLimit":{
+        "amount": "5000",
+        "currency": "EUR"       
+    },
+    "interestRate": "0.5"
+}
+```
+
+OwnerTransferDTO
+
+```bash
+{
+    "transferAmount": {
+        "amount":"10",
+        "currency" : "EUR"
+    },
+    "ownerTargetName": "James Smith",
+    "targetAccountId": "2",
+    "ownAccountId":"3"
+}
+```
+
+Role
+
+```bash
+{
+    "name": "Luis Perez"
+}
+```
+
 ## Future Work
 ## Resources
