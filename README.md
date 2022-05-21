@@ -20,11 +20,16 @@ Java, SpringBoot, MySQL, Postman.
 
 ![diagram-13559756363580999122](https://user-images.githubusercontent.com/104001417/169570867-16651834-6dc8-42c0-a810-be2a62c9c386.png)
 
-There are four types of accounts: 
+There are four types of accounts:
+
 -Saving 
+
 -Checking
+
 -Student checking  
+
 -Credit
+
 Accounts can only be created by an Admin.
 Anyone can create a new account holder user and login, but only admins when create account vinculate an account with its owner (account holder).
 Account Holders can make transfers from their account and check their balance. When a transfer is requested, the availability of funds (or the credit limit in the case of credit account) is checked before processing it. Once the transfer is made, if the balance falls below the minimum allowed a penalty fee is charged.
