@@ -34,7 +34,7 @@ public class TransferService implements ITransferService {
         if (lastTransferDate != null) {
             Duration duration = Duration.between(lastTransferDate, LocalDateTime.now());
             Long secondsBetween = duration.getSeconds();
-            if (currentAccount instanceof Savings && secondsBetween <= 10) {
+            if (currentAccount instanceof Savings && secondsBetween <= 1) {
                 ((Savings) currentAccount).setStatus(Status.FROZEN);
                 accountRepository.save(currentAccount);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "In order to prevent fraud your Account has been frozen and the transfer haven't been processed");

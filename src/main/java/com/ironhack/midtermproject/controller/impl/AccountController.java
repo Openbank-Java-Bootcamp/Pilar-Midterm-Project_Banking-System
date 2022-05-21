@@ -63,8 +63,8 @@ public class AccountController implements IAccountController {
 
     @PatchMapping("/setbalance") //esto solo los admin
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changeBalance(@RequestParam Long accountId,@RequestParam BigDecimal newBalance){
-        accountService.changeBalance(accountId, newBalance);
+    public void changeBalance(@RequestParam Long accountId,@RequestParam int newBalance){
+        accountService.changeBalance(accountId, BigDecimal.valueOf(newBalance));
     }
 
     @PatchMapping("/status") //esto solo los admin

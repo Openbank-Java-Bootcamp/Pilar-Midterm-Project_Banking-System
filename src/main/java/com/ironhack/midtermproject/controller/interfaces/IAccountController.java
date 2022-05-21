@@ -17,7 +17,7 @@ public interface IAccountController {
     void transferMoney(OwnerTransferDTO ownerTransferDTO);
     Money getBalance(Long accountId);
     Money getBalanceAdmin(Long accountId);
-    void changeBalance(Long accountId,BigDecimal newBalance);
+    void changeBalance(Long accountId,int newBalance);
     void deleteAccount(Long accountId);
     void changeStatus(Long accountId,String status);
 }
