@@ -31,9 +31,16 @@ There are four types of accounts:
 -Credit
 
 Accounts can only be created by an Admin.
+
 Anyone can create a new account holder user and login, but only admins when create account vinculate an account with its owner (account holder).
-Account Holders can make transfers from their account and check their balance. When a transfer is requested, the availability of funds (or the credit limit in the case of credit account) is checked before processing it. Once the transfer is made, if the balance falls below the minimum allowed a penalty fee is charged.
-Every time an account holder access their balance, it is checked if it is necessary to add corresponding interests (saving and credit account) or charge maintenance to the account (checking account).
+
+Account Holders can make transfers from their account and check their balance. 
+
+When a transfer is requested, the availability of funds (or the credit limit in the case of credit account) is checked before processing it. Once the transfer is made, if the balance falls below the minimum allowed a penalty fee is charged.
+
+In addition, suspicions of fraud are detected by freezing the account and preventing the transfer. Only Admin can reactivate the account.
+
+Every time an account holder access their balance, it is checked if it is necessary to add corresponding interests (in saving and credit account) or charge maintenance to the account (checking account).
 
 
 ## Server Routes Table
