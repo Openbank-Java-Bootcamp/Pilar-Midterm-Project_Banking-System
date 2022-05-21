@@ -19,4 +19,5 @@ public interface IAccountController {
     Money getBalanceAdmin(Long accountId);
     void changeBalance(Long accountId,BigDecimal newBalance);
     void deleteAccount(Long accountId);
+    void changeStatus(Long accountId,String status);
 }

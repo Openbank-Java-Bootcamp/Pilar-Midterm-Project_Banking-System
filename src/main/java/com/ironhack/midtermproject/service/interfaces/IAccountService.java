@@ -4,6 +4,7 @@ import com.ironhack.midtermproject.DTO.CheckingAccountDTO;
 import com.ironhack.midtermproject.DTO.CreditAccountDTO;
 import com.ironhack.midtermproject.DTO.OwnerTransferDTO;
 import com.ironhack.midtermproject.DTO.SavingAccountDTO;
+import com.ironhack.midtermproject.enums.Status;
 import com.ironhack.midtermproject.model.*;
 
 import java.math.BigDecimal;
@@ -18,5 +19,6 @@ public interface IAccountService {
     Money getBalanceAdmin(Long accountId);
     void changeBalance(Long accountId, BigDecimal newBalance);
     void deleteAccount(Long accountId);
+    void changeStatus(Long accountId, Status status);
 
 }

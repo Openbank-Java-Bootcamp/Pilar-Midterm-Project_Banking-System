@@ -43,7 +43,7 @@ public class MidtermProjectApplication {
 
 
 	@Bean
-	CommandLineRunner run(UserService userService, RoleService roleService, ThirdPartyService thirdPartyService, AccountService accountService, UserRepository userRepository) {
+	CommandLineRunner run(UserService userService, RoleService roleService, ThirdPartyService thirdPartyService, AccountService accountService, UserRepository userRepository, AccountRepository accountRepository) {
 		return args -> {
 			if(!Arrays.asList(environment.getActiveProfiles()).contains("test")) {
 				roleService.saveRole(new Role("ROLE_ACCOUNT_HOLDER"));
@@ -64,6 +64,11 @@ public class MidtermProjectApplication {
 				accountService.createCheckingAccount(new CheckingAccountDTO(new Money(new BigDecimal("200"), Currency.getInstance("EUR")), 1L, null, "1357"));
 				accountService.createCheckingAccount(new CheckingAccountDTO(new Money(new BigDecimal("500"), Currency.getInstance("EUR")), 2L, null, "1387"));
 				accountService.createSavingsAccount(new SavingAccountDTO(new Money(BigDecimal.valueOf(500), Currency.getInstance("EUR")), 1L, null, "1234", new Money(BigDecimal.valueOf(200), Currency.getInstance("EUR")), BigDecimal.valueOf(0.2)));
+
+				Account ac = accountRepository.findById(3L).get();
+				ac.setCreationDate(LocalDate.parse("2022-04-02"));
+				accountRepository.save(ac);
+
 			}
 		};
 	}

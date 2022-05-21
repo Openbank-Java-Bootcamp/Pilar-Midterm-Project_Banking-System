@@ -114,15 +114,19 @@ public class AccountService implements IAccountService {
         User currentUser = userRepository.findByUsername(currentUsername);
         Long accountHolderId = currentUser.getId();
 
+
         Account currentAccount = accountRepository.findById(ownerTransferDTO.getOwnAccountId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Id not found"));
         if(!currentAccount.getPrimaryOwner().getId().equals(accountHolderId) && (currentAccount.getSecondaryOwner()==null ||  !currentAccount.getSecondaryOwner().getId().equals(accountHolderId))){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This is not your account");
         }
 
-        //no funca
-        /*if(!(currentAccount instanceof CreditCard)) {
-            transferService.fraudDetectionOne(currentAccount, ownerTransferDTO.getTransferAmount().getAmount());
-        }*/
+        if(currentAccount instanceof Savings && ((Savings) currentAccount).getStatus().equals(Status.FROZEN) || currentAccount instanceof Checking && ((Checking) currentAccount).getStatus().equals(Status.FROZEN) || currentAccount instanceof StudentChecking && ((StudentChecking) currentAccount).getStatus().equals(Status.FROZEN)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"your account is frozen, contact with the bank");
+        }
+
+        transferService.fraudDetectionOne(currentAccount, ownerTransferDTO.getTransferAmount().getAmount());
+        transferService.fraudDetectionTwo(currentAccount, ownerTransferDTO.getTransferAmount().getAmount());
+
 
         //si no hay fraude, buscar la cuenta destino a ver si existe y entonces hacer la transferencia
         Account targetAccount = accountRepository.findById(ownerTransferDTO.getTargetAccountId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
@@ -240,11 +244,22 @@ public class AccountService implements IAccountService {
         accountRepository.save(accountFromDB);
     }
 
-    public void deleteAccount(@RequestParam Long accountId){
+    public void deleteAccount(Long accountId){
         Account accountFromDB= accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         accountRepository.deleteById(accountId);
     }
 
+    public void changeStatus(Long accountId,Status status){
+        Account accountFromDB= accountRepository.findById(accountId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        if (accountFromDB instanceof Savings){
+            ((Savings) accountFromDB).setStatus(status);
+        } else if (accountFromDB instanceof Checking){
+            ((Checking) accountFromDB).setStatus(status);
+        } else if (accountFromDB instanceof StudentChecking){
+            ((StudentChecking) accountFromDB).setStatus(status);
+        }
+        accountRepository.save(accountFromDB);
+    }
 
 }
 

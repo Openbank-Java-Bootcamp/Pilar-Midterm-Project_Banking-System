@@ -2,6 +2,7 @@ package com.ironhack.midtermproject.controller.impl;
 
 import com.ironhack.midtermproject.DTO.*;
 import com.ironhack.midtermproject.controller.interfaces.IAccountController;
+import com.ironhack.midtermproject.enums.Status;
 import com.ironhack.midtermproject.model.*;
 import com.ironhack.midtermproject.service.impl.AccountService;
 import jakarta.validation.Valid;
@@ -64,6 +65,12 @@ public class AccountController implements IAccountController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeBalance(@RequestParam Long accountId,@RequestParam BigDecimal newBalance){
         accountService.changeBalance(accountId, newBalance);
+    }
+
+    @PatchMapping("/status") //esto solo los admin
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeStatus(@RequestParam Long accountId, @RequestParam String status){
+        accountService.changeStatus(accountId, Status.valueOf(status));
     }
 
     @DeleteMapping("/account")

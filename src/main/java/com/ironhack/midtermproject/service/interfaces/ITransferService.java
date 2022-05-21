@@ -6,5 +6,5 @@ import java.math.BigDecimal;
 
 public interface ITransferService {
     void fraudDetectionOne(Account currentAccount, BigDecimal transferAmount);
-    boolean fraudDetectionTwo(Account currentAccount, BigDecimal transferAmount);
+    void fraudDetectionTwo(Account currentAccount, BigDecimal transferAmount);
 }
