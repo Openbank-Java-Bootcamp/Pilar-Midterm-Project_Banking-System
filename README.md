@@ -29,26 +29,27 @@ Every time an account holder access their balance, it is checked if it is necess
 
 ## Server Routes Table
  
-| Request Type  | Route              | Description                            | Authorization    |
-| ------------- | ---------------    | -------------------------------------- |----------------- |
-| `POST`        | /api/login         | Login  with username and password      | PUBLIC           |
-| `POST`        | /api/checking      | Create a Checking Account              | ADMIN            |
-| `POST`        | /api/saving        | Create a Saving Account                | ADMIN            |
-| `POST`        | /api/credit        | Create a Credit Account                | ADMIN            |
-| `PATCH`       | /api/transfer      | Transfer Money                         | ACCOUNT HOLDER           |
-| `GET`         | /api/balance       | Access account balance                 | ACCOUNT HOLDER           |
-| `GET`         | /api/adminbalance  | Access any account balance             | ADMIN            |
-| `PATCH`       | /api/setbalance    | Modify any account balance             | ADMIN            |
-| `DELETE`      | /api/account       | Delete an account                      | ADMIN          |
-| `POST`        | /api/roles         | Create a new authority role            | ADMIN   |
-| `POST`        | /api/roletouser    | Add role to a user                     | ADMIN   |
-| `POST`        | /api/thirdparties  | Create a Third Party                   | ADMIN   |
-| `PATCH`       | /api/thirdtransfer | A third party transfer money to an account      | PUBLIC   |
-| `PATCH`       | /api/thirdtake     | A third party takes money from an account      | PUBLIC   |
-| `DELETE`      | /api/thirdparties  | Delete a Third Party                   | ADMIN         |
-| `POST`        | /api/users         | Create an Account Holder               | PUBLIC         |
-| `POST`        | /api/admin         | Create an Admin                        | ADMIN         |
-| `DELETE`      | /api/users         | Delete a user                          | ADMIN          |
+| Request Type  | Route              | Description                            | Authorization    | Requested Data      |
+| ------------- | ---------------    | -------------------------------------- |----------------- |---------------------|
+| `POST`        | /api/login         | Login  with username and password      | PUBLIC           |username & password|
+| `POST`        | /api/checking      | Create a Checking Account              | ADMIN            |CheckingAccountDTO object  |
+| `POST`        | /api/saving        | Create a Saving Account                | ADMIN            |SavingAccountDTO object|
+| `POST`        | /api/credit        | Create a Credit Account                | ADMIN            |CreditAccountDTO object|
+| `PATCH`       | /api/transfer      | Transfer Money                         | ACCOUNT HOLDER   |OwnerTransferDTO object|
+| `GET`         | /api/balance       | Access account balance                 | ACCOUNT HOLDER   |accountId|
+| `GET`         | /api/adminbalance  | Access any account balance             | ADMIN            |accountId|
+| `PATCH`       | /api/setbalance    | Modify any account balance             | ADMIN            |accountId & newBalance|
+| `DELETE`      | /api/account       | Delete an account                      | ADMIN            |accountId|
+| `PATCH`       | /api/status        | Change account status                  | ADMIN            |accountId & status|
+| `POST`        | /api/roles         | Create a new authority role            | ADMIN            |Role object|
+| `POST`        | /api/roletouser    | Add role to a user                     | ADMIN            |RoleToUserDTO object|
+| `POST`        | /api/thirdparties  | Create a Third Party                   | ADMIN            |ThirdParty object|
+| `PATCH`       | /api/thirdtransfer | A third party transfer money to an account   | PUBLIC   |hashedKey & ThirdPartyTransferDTO object|
+| `PATCH`       | /api/thirdtake     | A third party takes money from an account   | PUBLIC   |hashedKey & ThirdPartyTransferDTO object|
+| `DELETE`      | /api/thirdparties  | Delete a Third Party                   | ADMIN         |thirdPartyId|
+| `POST`        | /api/users         | Create an Account Holder               | PUBLIC         |AccountHolder object|
+| `POST`        | /api/admin         | Create an Admin                        | ADMIN         |Admin object|
+| `DELETE`      | /api/users         | Delete a user                          | ADMIN          |userId|
 
 ## Future Work
 ## Resources
