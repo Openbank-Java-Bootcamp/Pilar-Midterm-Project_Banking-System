@@ -126,5 +126,60 @@ Role
 }
 ```
 
+RoleToUserDTO
+
+```bash
+{
+    "username": "Luis Perez",
+    "roleName":"ROLE_ADMIN"
+}
+```
+
+ThirdParty
+
+```bash
+{
+    "name": "Pilar Alvarez",
+    "hashedKey": "2345"
+}
+```
+
+ThirdPartyTransferDTO
+
+```bash
+{
+    "amount": "50",
+    "accountId": "1",
+    "accountSecretKey": "1357"
+}
+```
+
+AccountHolder
+
+```bash
+{
+    "name": "Pilar Alvarez",
+    "username": "pili",
+    "password": "4321",
+    "dateOfBirth" : "1990-01-15",
+    "primaryAddress": {
+        "streetAddress": "Pasaje 12",
+        "postalCode":"08041",
+        "city": "Madrid"
+    },
+    "mailingAddress": null
+}
+```
+
+Admin
+
+```bash
+{
+    "name": "Pilar Alvarez",
+    "username": "pili",
+    "password": "4321"
+}
+```
+
 ## Future Work
 ## Resources
