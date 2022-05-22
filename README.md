@@ -203,7 +203,7 @@ Admin
 
 ## Resources
 
-Instructors of Ironhack: Raymond & Shaun.
+Instructors of my Ironhack Bootcamp: Raymond & Shaun. :wink:
 
 https://www.baeldung.com/
 
