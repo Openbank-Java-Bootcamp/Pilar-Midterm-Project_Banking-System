@@ -15,7 +15,7 @@ $ git clone https://github.com/Openbank-Java-Bootcamp/Pilar-Midterm-Project_Bank
   
   With Postman installed, and this repository cloned and the server running, you can start making your requests.
   
-## Technologies used
+## :rocket: Technologies used
 
 Java, SpringBoot, MySQL, Postman.
 
