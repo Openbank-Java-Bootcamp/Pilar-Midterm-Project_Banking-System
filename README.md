@@ -9,8 +9,12 @@ This project represents a simple online banking system API that enables account 
 ```bash
 $ git clone https://github.com/Openbank-Java-Bootcamp/Pilar-Midterm-Project_Banking-System
 ```
+  You will need to download the Postman tool from getpostman.com/postman.
 
   Before running the API server, you should set the database config with yours or set your database config with my values.
+  
+  With Postman installed, and this repository cloned and the server running, you can start making your requests.
+  
 ## Technologies used
 
 Java, SpringBoot, MySQL, Postman.
