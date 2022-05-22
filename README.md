@@ -47,7 +47,7 @@ In addition, suspicions of fraud are detected by freezing the account and preven
 Every time an account holder access their balance, it is checked if it is necessary to add corresponding interests (in saving and credit account) or charge maintenance to the account (checking account).
 
 
-## :vertical_traffic_light: Server Routes Table
+## :postbox: Server Routes Table
  
 | Request Type  | Route              | Description                            | Authorization    | Requested Data      |
 | ------------- | ---------------    | -------------------------------------- |----------------- |---------------------|
