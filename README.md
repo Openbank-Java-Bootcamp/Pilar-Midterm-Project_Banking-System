@@ -3,7 +3,7 @@
 This project represents a simple online banking system API that enables account holders to interact with their bank accounts and third-party users to receive and send money to and from accounts of this bank.
 
 
-## Setup
+## :gear: Setup
 
   Clone the Banking System API. In a terminal, run:
 ```bash
