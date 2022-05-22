@@ -18,6 +18,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +34,7 @@ import java.util.Currency;
 public class MidtermProjectApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(MidtermProjectApplication.class, args);
 	}
 
@@ -40,7 +45,6 @@ public class MidtermProjectApplication {
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 
 	@Bean
 	CommandLineRunner run(UserService userService, RoleService roleService, ThirdPartyService thirdPartyService, AccountService accountService, UserRepository userRepository, AccountRepository accountRepository) {

@@ -54,19 +54,16 @@ public class TransferService implements ITransferService {
 
 
     public void fraudDetectionTwo(Account currentAccount, BigDecimal transferAmount){
-        //tengo que agrupar por dia y calcular el maximo amount transferido en un dia,
-        // y comparar con el total del dia en que se esta haciendo la transferencia.
 
         Period period = Period.between(currentAccount.getCreationDate(), LocalDate.now());
         /*int years = Math.abs(period.getYears());
         int months = Math.abs(period.getMonths());*/
         int days = Math.abs(period.getDays());
 
-        //Checking this type of fraud only if there is a minimum of 1 transfer per day and the account is at least 7 days old
+        //Checking this type of fraud only if a minimum of 7 transfers have been made since the account creation and the account is at least 7 days old
         if(transferRepository.findCountOfTransactionsByAccountId(currentAccount.getId()) > 7 && days > 7){
             BigDecimal maxDaily = transferRepository.findMaxDailyTransferAmount(currentAccount.getId());
             BigDecimal actualDaily = null;
-            //aca si amounttransferedlastdayfrom now es null tengo que asignarle cero en vez de null
             BigDecimal result = transferRepository.findAmountTransferedLastDayFromNow(LocalDateTime.now(), currentAccount.getId());
             if(result == null){
                 result = BigDecimal.ZERO;

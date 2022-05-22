@@ -127,8 +127,6 @@ public class AccountService implements IAccountService {
         transferService.fraudDetectionOne(currentAccount, ownerTransferDTO.getTransferAmount().getAmount());
         transferService.fraudDetectionTwo(currentAccount, ownerTransferDTO.getTransferAmount().getAmount());
 
-
-        //si no hay fraude, buscar la cuenta destino a ver si existe y entonces hacer la transferencia
         Account targetAccount = accountRepository.findById(ownerTransferDTO.getTargetAccountId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id not found"));
 
         if (!targetAccount.getPrimaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()) && (targetAccount.getSecondaryOwner() == null || !targetAccount.getSecondaryOwner().getName().equals(ownerTransferDTO.getOwnerTargetName()))) {
@@ -137,27 +135,24 @@ public class AccountService implements IAccountService {
             BigDecimal actualBalance = currentAccount.getBalance().getAmount();
             BigDecimal amountToTransfer = ownerTransferDTO.getTransferAmount().getAmount();
             if (currentAccount instanceof CreditCard && actualBalance.subtract(amountToTransfer).compareTo(((CreditCard) currentAccount).getCreditLimit().getAmount().negate()) == -1) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have reached your credit limit");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have reached your credit limit");
             } else if (!(currentAccount instanceof CreditCard) && actualBalance.compareTo(amountToTransfer) == -1) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have reached your credit limit");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have sufficient funds");
             } else {
                 currentAccount.setBalance(new Money(actualBalance.subtract(ownerTransferDTO.getTransferAmount().getAmount()), Currency.getInstance("EUR")));
                 targetAccount.setBalance(new Money(targetAccount.getBalance().getAmount().add(ownerTransferDTO.getTransferAmount().getAmount()), Currency.getInstance("EUR")));
             }
         }
 
-        //tambien necesito saber el tipo de la cuenta de origen para ver si baja del minimumbalance
         if (currentAccount instanceof Savings && currentAccount.getBalance().getAmount().compareTo(((Savings) currentAccount).getMinimumBalance().getAmount()) == -1) {
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()), currentAccount.getBalance().getCurrency()));
         } else if (currentAccount instanceof Checking && currentAccount.getBalance().getAmount().compareTo(((Checking) currentAccount).getMinimumBalance().getAmount()) == -1) {
             currentAccount.setBalance(new Money(currentAccount.getBalance().getAmount().subtract(currentAccount.getPenaltyFee().getAmount()), currentAccount.getBalance().getCurrency()));
         }
 
-        //cada vez que se hace una transferencia agregarla a la tabla transfer
         Transfer transfer = new Transfer(currentAccount.getId(), ownerTransferDTO.getTransferAmount().getAmount(), LocalDateTime.now());
         transferRepository.save(transfer);
 
-        //me falta guardar las cuentas actualizadas tambien
         accountRepository.save(currentAccount);
         accountRepository.save(targetAccount);
     }

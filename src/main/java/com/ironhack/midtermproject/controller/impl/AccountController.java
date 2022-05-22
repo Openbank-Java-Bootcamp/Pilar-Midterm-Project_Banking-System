@@ -30,13 +30,13 @@ public class AccountController implements IAccountController {
         accountService.createCheckingAccount(checkingAccountDTO);
     }
 
-    @PostMapping("/saving") //only admin??
+    @PostMapping("/saving")
     @ResponseStatus(HttpStatus.CREATED)
     public void createSavingsAccount(@RequestBody @Valid SavingAccountDTO savingAccountDTO){
         accountService.createSavingsAccount(savingAccountDTO);
     }
 
-    @PostMapping("/credit") //only admin??
+    @PostMapping("/credit")
     @ResponseStatus(HttpStatus.CREATED)
     public void createCreditAccount(@RequestBody @Valid CreditAccountDTO creditAccountDTO){
         accountService.createCreditAccount(creditAccountDTO);
@@ -49,25 +49,25 @@ public class AccountController implements IAccountController {
     }
 
 
-    @GetMapping("/balance") //esto el accountholder
+    @GetMapping("/balance")
     @ResponseStatus(HttpStatus.OK)
     public Money getBalance(@RequestParam Long accountId){
         return accountService.getBalance(accountId);
     }
 
-    @GetMapping("/adminbalance") //esto solo los admin
+    @GetMapping("/adminbalance")
     @ResponseStatus(HttpStatus.OK)
     public Money getBalanceAdmin(@RequestParam Long accountId){
         return accountService.getBalanceAdmin(accountId);
     }
 
-    @PatchMapping("/setbalance") //esto solo los admin
+    @PatchMapping("/setbalance")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeBalance(@RequestParam Long accountId,@RequestParam int newBalance){
         accountService.changeBalance(accountId, BigDecimal.valueOf(newBalance));
     }
 
-    @PatchMapping("/status") //esto solo los admin
+    @PatchMapping("/status")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeStatus(@RequestParam Long accountId, @RequestParam String status){
         accountService.changeStatus(accountId, Status.valueOf(status));

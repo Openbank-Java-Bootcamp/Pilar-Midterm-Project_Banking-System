@@ -75,13 +75,6 @@ class AccountControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
-  /*  DateTimeFormatter df = new DateTimeFormatterBuilder()
-            // case insensitive to parse JAN and FEB
-            //.parseCaseInsensitive()
-            // add pattern
-            .appendPattern("yyyy-MM-dd")
-            // create formatter (use English Locale to parse month names)
-            .toFormatter(Locale.ENGLISH);*/
 
     private DateTimeFormatter df =
             new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd[ [HH][:mm][:ss][.SSS]]")
@@ -126,7 +119,7 @@ class AccountControllerTest {
         Transfer tf5 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-06",df));
         Transfer tf6 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-07",df));
         Transfer tf7 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-08",df));
-
+        Transfer tf8 = new Transfer(1L,BigDecimal.valueOf(50), LocalDateTime.parse("2022-05-08",df));
 
         user1.getRoles().add(role1);
         user2.getRoles().add(role1);
@@ -137,7 +130,7 @@ class AccountControllerTest {
         userRepository.saveAll(List.of(user1, user2, user3, user4));
         thirdPartyRepository.save(tp1);
         accountRepository.saveAll(List.of(acc1, acc2, acc3, acc4, acc5, acc6));
-        transferRepository.saveAll(List.of(tf1, tf2, tf3, tf4, tf5, tf6,tf7));
+        transferRepository.saveAll(List.of(tf1, tf2, tf3, tf4, tf5, tf6,tf7,tf8));
     }
 
     @AfterEach
@@ -215,12 +208,12 @@ class AccountControllerTest {
 
     @Test
     @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
-    void transferMoney_Fraud_NotContent() throws Exception {
+    void transferMoney_Fraud_BadRequest() throws Exception {
         OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(1000), Currency.getInstance("EUR")), "Macarena Garcia", 2L,1L);
         String body = objectMapper.writeValueAsString(o);
         MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
                 .content(body)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent()).andReturn();
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
         Account acc = accountRepository.findById(o.getOwnAccountId()).get();
         assertEquals("FROZEN",((Savings) acc).getStatus().toString());
         //assertTrue(((Savings) acc).getStatus().toString().contains("FROZEN"));
@@ -229,22 +222,22 @@ class AccountControllerTest {
 
     @Test
     @WithMockUser(username = "pili", password = "1234", roles = {"ACCOUNT_HOLDER"})
-    void transferMoney_AmountGraterThanBalance_NotContent() throws Exception {
-        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(600), Currency.getInstance("EUR")), "Macarena Garcia", 2L,1L);
+    void transferMoney_AmountGraterThanBalance_BadRequest() throws Exception {
+        OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(60000), Currency.getInstance("EUR")), "Macarena Garcia", 2L,1L);
         String body = objectMapper.writeValueAsString(o);
         MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
                 .content(body)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden()).andReturn();
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
     }
 
     @Test
     @WithMockUser(username = "pauli", password = "1234", roles = {"ACCOUNT_HOLDER"})
-    void transferMoney_AmountGraterThanCredit_Forbidden() throws Exception {
+    void transferMoney_AmountGraterThanCredit_BadRequest() throws Exception {
         OwnerTransferDTO o = new OwnerTransferDTO(new Money(BigDecimal.valueOf(2000), Currency.getInstance("EUR")), "Macarena Garcia", 2L,6L);
         String body = objectMapper.writeValueAsString(o);
         MvcResult mvcResult = mockMvc.perform(patch("/api/transfer")
                 .content(body)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden()).andReturn();
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andReturn();
     }
 
     @Test
