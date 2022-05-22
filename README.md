@@ -20,7 +20,7 @@ $ git clone https://github.com/Openbank-Java-Bootcamp/Pilar-Midterm-Project_Bank
 Java, SpringBoot, MySQL, Postman.
 
 
-## Models
+## :world_map: Models
 
 ![diagram-13559756363580999122](https://user-images.githubusercontent.com/104001417/169570867-16651834-6dc8-42c0-a810-be2a62c9c386.png)
 
