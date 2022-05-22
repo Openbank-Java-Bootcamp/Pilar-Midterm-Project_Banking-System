@@ -1,4 +1,4 @@
-# Banking System API
+# :computer: Banking System API
 
 This project represents a simple online banking system API that enables account holders to interact with their bank accounts and third-party users to receive and send money to and from accounts of this bank.
 
